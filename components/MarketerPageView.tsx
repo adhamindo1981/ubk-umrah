@@ -36,6 +36,7 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
   const { t, isArabic } = useLanguage();
   const [activeZoomPoster, setActiveZoomPoster] = useState<FeaturedPoster | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<string>("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Format WhatsApp Link for Consultant
   const rawPhone = marketer.whatsapp || "6281234567890";
@@ -52,7 +53,7 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
       dir={isArabic ? "rtl" : "ltr"}
     >
       {/* Isolated Luxury Header (No links to main website to preserve marketer attribution) */}
-      <header className="border-b border-amber-500/20 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50 shadow-lg">
+      <header className="border-b border-amber-500/20 bg-slate-950/95 backdrop-blur-md sticky top-0 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 select-none cursor-default shrink-0">
             <UbkLogo size="sm" variant="dark" showSubtitle={false} animated={true} />
@@ -63,31 +64,92 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-3 text-sm shrink-0">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-3 text-sm shrink-0">
             <LanguageSwitcher />
 
             {/* Marketer Dashboard Login Entrance */}
             <Link
               href="/auth/signin"
-              className="text-xs font-bold text-amber-300/90 hover:text-amber-200 bg-slate-900/90 hover:bg-slate-800 border border-amber-500/30 hover:border-amber-400 p-2 sm:px-3.5 sm:py-2 rounded-xl transition inline-flex items-center gap-1 shadow-sm shrink-0"
+              className="text-xs font-bold text-amber-300/90 hover:text-amber-200 bg-slate-900/90 hover:bg-slate-800 border border-amber-500/30 hover:border-amber-400 px-3.5 py-2 rounded-xl transition inline-flex items-center gap-1.5 shadow-sm shrink-0"
               title={isArabic ? "دخول المسوق إلى لوحة التحكم" : "Masuk ke Dasbor Mitra"}
             >
               <span>🔐</span>
-              <span className="hidden sm:inline">{isArabic ? "دخول المسوق" : "Masuk Mitra"}</span>
+              <span>{isArabic ? "دخول المسوق" : "Masuk Mitra"}</span>
             </Link>
 
             <a
               href={waLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500 hover:from-emerald-500 hover:to-amber-400 text-slate-950 font-black text-[11px] sm:text-xs px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-lg shadow-emerald-950/50 transition-all duration-300 transform active:scale-95 inline-flex items-center gap-1 shrink-0 whitespace-nowrap"
+              className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500 hover:from-emerald-500 hover:to-amber-400 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-950/50 transition-all duration-300 transform active:scale-95 inline-flex items-center gap-1.5 shrink-0"
             >
               <span>💬</span>
-              <span className="hidden sm:inline">{t("consultantWa")}</span>
-              <span className="sm:hidden">{isArabic ? "تواصل واتساب" : "Chat WA"}</span>
+              <span>{t("consultantWa")}</span>
             </a>
           </div>
+
+          {/* Mobile Hamburger Button (3 Bars) */}
+          <div className="flex md:hidden items-center">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="w-10 h-10 rounded-xl bg-slate-900 border border-amber-500/30 text-amber-300 flex flex-col items-center justify-center gap-1.5 shadow-md active:scale-95 transition"
+              aria-label="Toggle Mobile Menu"
+            >
+              <span className={`w-5 h-0.5 bg-amber-400 rounded-full transition-transform duration-300 ${mobileMenuOpen ? "rotate-45 translate-y-2" : ""}`} />
+              <span className={`w-5 h-0.5 bg-amber-400 rounded-full transition-opacity duration-300 ${mobileMenuOpen ? "opacity-0" : ""}`} />
+              <span className={`w-5 h-0.5 bg-amber-400 rounded-full transition-transform duration-300 ${mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Dropdown Menu Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-amber-500/20 bg-slate-950/98 backdrop-blur-xl px-4 py-5 space-y-3.5 animate-fadeIn shadow-2xl">
+            {/* Marketer Attribution Badge */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                <span>🛡️</span>
+                <span>{marketer.username}</span>
+                <span className="text-slate-400 font-mono text-[10px]">({marketer.referralCode})</span>
+              </span>
+              <LanguageSwitcher />
+            </div>
+
+            {/* Direct WhatsApp Consultation */}
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-emerald-950/50 transition active:scale-95"
+            >
+              <span>💬</span>
+              <span>{t("consultantWa")}</span>
+            </a>
+
+            {/* Direct Booking Scroll */}
+            <a
+              href="#form-booking"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-900 border border-emerald-500/40 text-emerald-300 font-black text-xs hover:bg-slate-850 transition"
+            >
+              <span>🕋</span>
+              <span>{t("ctaRegister")}</span>
+            </a>
+
+            {/* Marketer Portal Login Button */}
+            <Link
+              href="/auth/signin"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-900 border border-amber-500/30 text-amber-300 font-bold text-xs hover:bg-slate-850 transition"
+            >
+              <span>🔐</span>
+              <span>{isArabic ? "دخول المسوق إلى حسابه" : "Login ke Dasbor Mitra"}</span>
+            </Link>
+          </div>
+        )}
       </header>
 
       {/* Hero Section: Majestic 10-Second Transitioning Background + Animated UBK Emblem + Marketer VIP Card */}

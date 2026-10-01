@@ -18,6 +18,7 @@ import { SocialMediaIcons } from "@/components/SocialMediaIcons";
 export function HomePageView() {
   const { t, isArabic } = useLanguage();
   const [selectedPackage, setSelectedPackage] = useState<string>("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const homeWaText = encodeURIComponent(
     `Assalamu'alaikum UBK Umrah, saya ingin konsultasi mengenai program dan paket perjalanan ibadah Umrah.\n\n----------------------------------------\n\nالسلام عليكم، أود الاستفسار عن باقات وبرامج رحلات العمرة لدى UBK.`
   );
@@ -32,33 +33,92 @@ export function HomePageView() {
       <IslamicIntro />
 
       {/* Navigation Bar */}
-      <header className="border-b border-amber-500/20 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50 shadow-lg">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
+      <header className="border-b border-amber-500/20 bg-slate-950/95 backdrop-blur-md sticky top-0 z-50 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <Link href="/" className="hover:opacity-95 transition group shrink-0">
             <UbkLogo size="sm" variant="dark" showSubtitle={false} animated={true} />
           </Link>
 
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-3">
             <LanguageSwitcher />
 
             <Link
               href="/auth/signin"
-              className="text-xs font-bold text-slate-300 hover:text-amber-400 transition w-8 h-8 sm:w-auto sm:h-auto p-0 sm:px-3 sm:py-2 rounded-xl hover:bg-slate-900 border border-slate-800 inline-flex items-center justify-center gap-1 shrink-0"
+              className="text-xs font-bold text-slate-300 hover:text-amber-400 transition px-3 py-2 rounded-xl hover:bg-slate-900 border border-slate-800 inline-flex items-center gap-1.5 shrink-0"
               title={t("loginPartner")}
             >
               <span>🔐</span>
-              <span className="hidden sm:inline">{t("loginPartner")}</span>
+              <span>{t("loginPartner")}</span>
             </Link>
 
             <a
               href="#form-booking"
-              className="text-xs font-black bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500 hover:from-emerald-500 hover:to-amber-400 text-slate-950 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl shadow-lg shadow-emerald-950/50 transition-all duration-300 transform active:scale-95 shrink-0 whitespace-nowrap"
+              className="text-xs font-black bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500 hover:from-emerald-500 hover:to-amber-400 text-slate-950 px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-950/50 transition-all duration-300 transform active:scale-95 shrink-0"
             >
-              <span className="relative z-10 font-bold hidden sm:inline">{t("ctaRegister")}</span>
-              <span className="relative z-10 font-bold sm:hidden">{isArabic ? "حجز الآن" : "Daftar"}</span>
+              <span className="relative z-10 font-bold">{t("ctaRegister")}</span>
             </a>
           </div>
+
+          {/* Mobile Hamburger Button (3 Bars) */}
+          <div className="flex md:hidden items-center">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="w-10 h-10 rounded-xl bg-slate-900 border border-amber-500/30 text-amber-300 flex flex-col items-center justify-center gap-1.5 shadow-md active:scale-95 transition"
+              aria-label="Toggle Mobile Menu"
+            >
+              <span className={`w-5 h-0.5 bg-amber-400 rounded-full transition-transform duration-300 ${mobileMenuOpen ? "rotate-45 translate-y-2" : ""}`} />
+              <span className={`w-5 h-0.5 bg-amber-400 rounded-full transition-opacity duration-300 ${mobileMenuOpen ? "opacity-0" : ""}`} />
+              <span className={`w-5 h-0.5 bg-amber-400 rounded-full transition-transform duration-300 ${mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Dropdown Menu Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-amber-500/20 bg-slate-950/98 backdrop-blur-xl px-4 py-5 space-y-3.5 animate-fadeIn shadow-2xl">
+            {/* Language Switcher Bar */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <span className="text-xs font-bold text-slate-400">
+                {isArabic ? "لغة الموقع" : "Bahasa Halaman"}
+              </span>
+              <LanguageSwitcher />
+            </div>
+
+            {/* Direct CTA Registration Button */}
+            <a
+              href="#form-booking"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-emerald-950/50 transition active:scale-95"
+            >
+              <span>🕋</span>
+              <span>{t("ctaRegister")}</span>
+            </a>
+
+            {/* Marketer Portal Login Button */}
+            <Link
+              href="/auth/signin"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-900 border border-amber-500/30 text-amber-300 font-bold text-xs hover:bg-slate-850 transition"
+            >
+              <span>🔐</span>
+              <span>{t("loginPartner")}</span>
+            </Link>
+
+            {/* Direct Company WhatsApp Chat */}
+            <a
+              href={companyWaLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 font-bold text-xs hover:bg-emerald-900 transition"
+            >
+              <span>💬</span>
+              <span>{t("consultantWa")}</span>
+            </a>
+          </div>
+        )}
       </header>
 
       {/* Hero Section: Majestic Composite Panorama + Islamic Arabesque Overlay */}
