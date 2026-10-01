@@ -3,10 +3,19 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { comparePassword } from "@/lib/auth";
 
+if (!process.env.NEXTAUTH_URL) {
+  if (process.env.VERCEL_URL) {
+    process.env.NEXTAUTH_URL = `https://${process.env.VERCEL_URL}`;
+  } else {
+    process.env.NEXTAUTH_URL = "https://ubk-umrah.vercel.app";
+  }
+}
+
 export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
   },
+  debug: true,
   secret: process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || "ubk-umrah-secret-production-auth-key-2026",
   providers: [
     CredentialsProvider({
