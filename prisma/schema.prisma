@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User model supporting Indonesian market, Master & Sub-marketer hierarchy (Tree)
+model User {
+  id               Int             @id @default(autoincrement())
+  username         String          @unique
+  email            String          @unique
+  passwordHash     String
+  role             String          @default("MARKETER") // MARKETER | ADMIN
+  isApproved       Boolean         @default(true)       // Created by Admin or Master Marketer
+  mustChangePassword Boolean       @default(false)      // First-time login password change flag
+  referralCode     String?         @unique              // Generated upon first-time password set
+  whatsapp         String?         // Nomor WhatsApp Indonesia (+62 / 08...)
+  
+  // Banking / E-Wallet Info (BCA, Mandiri, BNI, BRI, GoPay, OVO, DANA)
+  bankName         String?         // Nama Bank / E-Wallet (BCA, Mandiri, BRI, BSI, GoPay, etc.)
+  bankAccountNumber String?        // Nomor Rekening / Nomor E-Wallet
+  bankAccountName  String?         // Nama Pemilik Rekening
+  idNumber         String?         // Nomor KTP / NIK
+
+  // Tree / Downline Relation (المسوّق المباشر والمسوقين التابعين)
+  parentId         Int?            // ID المسوق الأب / الراعي
+  parent           User?           @relation("MarketerTree", fields: [parentId], references: [id])
+  subMarketers     User[]          @relation("MarketerTree")
+  subMarketerShare Float           @default(350000) // نصيب المسوق الفرعي بالروبية من أصل 500 ألف
+
+  rewards          Reward[]
+  orders           Order[]
+  payoutRequests   PayoutRequest[]
+  purchasedPosters MarketerPoster[]
+  createdAt        DateTime        @default(now())
+}
+
+model Client {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  phone     String?  // Nomor Telepon Jamaah
+  orders    Order[]
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id            Int      @id @default(autoincrement())
+  client        Client   @relation(fields: [clientId], references: [id])
+  clientId      Int
+  marketer      User?    @relation(fields: [marketerId], references: [id])
+  marketerId    Int?
+  referralCode  String?  // Kode Referral yang dimasukkan
+  status        String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, CANCELED
+  rewardAwarded Boolean  @default(false)     // True jika Rp 500.000 sudah dibagikan
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Reward {
+  id          Int      @id @default(autoincrement())
+  marketer    User     @relation(fields: [marketerId], references: [id])
+  marketerId  Int
+  amount      Float    @default(500000) // Nilai komisi dalam Rupiah (IDR)
+  points      Int      @default(500)    // Untuk backward compatibility
+  description String?  // Deskripsi (Komisi Langsung / Komisi Tim)
+  orderId     Int?
+  createdAt   DateTime @default(now())
+}
+
+model PayoutRequest {
+  id              Int      @id @default(autoincrement())
+  marketer        User     @relation(fields: [marketerId], references: [id])
+  marketerId      Int
+  amount          Float    // Nominal penarikan dana dalam Rupiah (IDR)
+  bankInfo        String   // Rincian Bank & No Rekening
+  status          String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  receiptImageUrl String?  // Bukti transfer bank dari Admin saat approve
+  notes           String?  // Catatan admin / no referensi transfer
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// Marketplace Model for Umrah Marketing Posters (متجر البوستات والتصاميم)
+model PosterTemplate {
+  id              Int              @id @default(autoincrement())
+  title           String           // Judul Desain Poster
+  description     String?          // Deskripsi
+  price           Float            @default(25000) // Harga dalam Rupiah (e.g. Rp 25.000)
+  previewImageUrl String           // Gambar Pratinjau dengan Watermark (علامة مائية)
+  cleanImageUrl   String           // Gambar Master Asli Resolusi Tinggi (بدون علامة)
+  category        String           @default("INSTAGRAM_FEED") // FEED, STORY, BANNER
+  purchases       MarketerPoster[]
+  createdAt       DateTime         @default(now())
+}
+
+model MarketerPoster {
+  id                 Int            @id @default(autoincrement())
+  marketer           User           @relation(fields: [marketerId], references: [id])
+  marketerId         Int
+  template           PosterTemplate @relation(fields: [templateId], references: [id])
+  templateId         Int
+  customizedImageUrl String?        // Poster hasil render dengan No WA & Kode Marketer
+  licenseKey         String         @unique @default(uuid()) // رقم الترخيص وحماية الملكية الفكرية
+  isFeaturedOnPage   Boolean        @default(true) // عرض في صفحة المسوق الخاصة
+  paymentMethod      String         @default("FREE_STARTER") // FREE_STARTER | COMMISSION_BALANCE | BANK_TRANSFER
+  paymentStatus      String         @default("APPROVED")     // APPROVED | PENDING_APPROVAL | REJECTED
+  receiptImageUrl    String?        // Bukti transfer bank yang diunggah
+  pricePaid          Float          @default(0)              // Nominal yang dibayarkan
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @default(now()) @updatedAt
+}
+
+model SystemSetting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+// Model for Dynamic Umrah Packages Management (إدارة باقات وبرامج العمرة)
+model UmrahPackage {
+  id            Int      @id @default(autoincrement())
+  title         String   // Judul / Nama Program (e.g. UMRAH TAYSIR PROGRAM 9 HARI)
+  titleAr       String?  // العنوان بالعربية
+  year          Int      @default(2026) // السنة
+  month         String   // الشهر (e.g. Desember / ديسمبر)
+  programDays   Int      @default(9) // عدد أيام البرنامج
+  downPayment   Float    @default(5000000) // قيمة الدفعة المقدمة (DP)
+  airline       String   // الخطوط الجوية الناقلة (e.g. Qatar Airways)
+  makkahHotel   String   // مكان الإقامة بمكة (e.g. Jada Ajyad / Kayan Raya / Setaraf ⭐⭐⭐ 4 Malam)
+  madinahHotel  String   // مكان الإقامة بالمدينة (e.g. Andalus Salam / Nada Salam / Setaraf ⭐⭐⭐ 3 Malam)
+  freebies      String   // المميزات المجانية (Zam-zam, Albaik, Full Ziarah)
+  inclusions    String   // قائمة المحتويات المشمولة بالسعر
+  priceQuad     Float    // سعر الغرفة الجماعية (QUAD) 4 أفراد
+  priceTriple   Float    // سعر الغرفة الثلاثية (TPL) 3 أفراد
+  priceDouble   Float    // سعر الغرفة الثنائية (DBL) فردين
+  scholarLeader String?  // برفقة الشيخ أو الأستاذ (e.g. Sheikh Dr. Hassan Bugis)
+  notes         String?  // ملاحظات وسعر الصرف
+  customFields  String?  // حقول ومعلومات إضافية مرنة بصيغة JSON
+  badge         String?  // الشارة التسويقية (Paling Diminati, VIP, Reguler)
+  badgeAr       String?  // الشارة بالعربية
+  posterUrl     String?  // رابط أو ملف بوست الباقة المحمي
+  isPopular     Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+}
+
+// Model for Real Pilgrim Photos Gallery (معرض صور المعتمرين الحقيقيين)
+model PilgrimPhoto {
+  id          Int      @id @default(autoincrement())
+  title       String   // e.g. "فوج المعتمرين في ساحة الحرم المكي الشريف"
+  titleAr     String?  // العنوان بالعربية
+  category    String   @default("MAKKAH") // MAKKAH | MADINAH | AIRPORT | ZIARAH
+  categoryAr  String?  // مكة المكرمة | المدينة المنورة | المطار والاستقبال | المزارات
+  imageUrl    String   // مسار الصورة أو base64 أو رابط الصورة
+  location    String?  // الموقع (e.g. Masjidil Haram, Albaik, Kereta Cepat)
+  year        Int      @default(2025)
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+}
+
