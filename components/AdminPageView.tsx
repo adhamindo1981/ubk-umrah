@@ -13,6 +13,7 @@ import { AdminPosterManagementModal } from "@/components/AdminPosterManagementMo
 import { AdminPackagesManagementModal } from "@/components/AdminPackagesManagementModal";
 import { AdminGalleryManagementModal } from "@/components/AdminGalleryManagementModal";
 import { UbkLogo } from "@/components/UbkLogo";
+import { LogoutButton } from "@/components/LogoutButton";
 import Link from "next/link";
 
 export interface AdminPageViewProps {
@@ -58,6 +59,7 @@ export function AdminPageView({
               <Link href="/" className="text-slate-400 hover:text-white text-xs transition px-2 py-1 rounded-lg hover:bg-slate-800 hidden sm:inline">
                 {t("home")}
               </Link>
+              <LogoutButton variant="dark" compactOnMobile={true} />
             </div>
           </div>
 
@@ -86,6 +88,9 @@ export function AdminPageView({
             <Link href="/dashboard" className="text-slate-400 hover:text-white text-xs transition px-2.5 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700 sm:hidden shrink-0">
               {t("goToDashboard")}
             </Link>
+            <div className="shrink-0 sm:hidden">
+              <LogoutButton variant="dark" />
+            </div>
           </div>
         </div>
       </header>

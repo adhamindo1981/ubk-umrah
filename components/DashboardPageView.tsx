@@ -9,6 +9,7 @@ import { InviteMarketerModal } from "@/components/InviteMarketerModal";
 import { PosterMarketplaceModal } from "@/components/PosterMarketplaceModal";
 import { MarketerActions } from "@/app/dashboard/MarketerActions";
 import { UbkLogo } from "@/components/UbkLogo";
+import { LogoutButton } from "@/components/LogoutButton";
 import Link from "next/link";
 
 export interface DashboardPageViewProps {
@@ -103,6 +104,8 @@ export function DashboardPageView({
               <span className="text-slate-600 text-xs hidden lg:inline-block font-semibold">
                 {t("helloUser", { name: user.username })}
               </span>
+
+              <LogoutButton variant="light" compactOnMobile={true} />
             </div>
           </div>
 
@@ -136,6 +139,10 @@ export function DashboardPageView({
                 <span>{t("adminBadge")}</span>
               </Link>
             )}
+
+            <div className="shrink-0 sm:hidden">
+              <LogoutButton variant="light" />
+            </div>
           </div>
         </div>
       </header>
