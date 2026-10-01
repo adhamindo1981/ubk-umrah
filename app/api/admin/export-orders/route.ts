@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 
 // Force dynamic rendering – required because getServerSession reads request headers
 export const dynamic = "force-dynamic";
 
-const prisma = new PrismaClient();
+
 
 /**
  * GET route handler to export all orders and clients to a CSV file.

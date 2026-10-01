@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
+
 
 function generateCustomTemplateSvg(title: string, subtitle: string, price: string, bgStart: string, bgEnd: string, isWatermarked = false) {
   const watermarkOverlay = isWatermarked

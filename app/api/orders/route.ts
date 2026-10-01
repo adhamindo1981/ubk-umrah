@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { sendMail } from "@/lib/email";
 
-const prisma = new PrismaClient();
+
 
 /**
  * Handle new Umrah booking registrations.

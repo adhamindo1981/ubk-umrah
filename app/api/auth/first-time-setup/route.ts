@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { hashPassword } from "@/lib/auth";
 import { generateShortReferralCode } from "@/lib/referral";
 
-const prisma = new PrismaClient();
+
 
 /**
  * POST /api/auth/first-time-setup

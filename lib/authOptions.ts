@@ -1,15 +1,13 @@
 import { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { comparePassword } from "@/lib/auth";
-
-const prisma = new PrismaClient();
 
 export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
   },
-  secret: process.env.JWT_SECRET || "fallback-secret-for-dev",
+  secret: process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || "ubk-umrah-secret-production-auth-key-2026",
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -21,28 +19,36 @@ export const authOptions: AuthOptions = {
         if (!credentials?.identifier || !credentials?.password) return null;
         const { identifier, password } = credentials;
 
-        const user = await prisma.user.findFirst({
-          where: {
-            OR: [{ username: identifier }, { email: identifier }],
-          },
-        });
-        if (!user) return null;
+        try {
+          const user = await prisma.user.findFirst({
+            where: {
+              OR: [{ username: identifier }, { email: identifier }],
+            },
+          });
+          if (!user) return null;
 
-        const isValid = await comparePassword(password, user.passwordHash);
-        if (!isValid) return null;
+          const isValid = await comparePassword(password, user.passwordHash);
+          if (!isValid) return null;
 
-        // Check if marketer account is approved by admin
-        if (user.role === "MARKETER" && !user.isApproved) {
-          throw new Error("حسابك بانتظار موافقة الإدارة. يرجى التواصل مع المسؤول لتفعيل الحساب.");
+          // Check if marketer account is approved by admin
+          if (user.role === "MARKETER" && !user.isApproved) {
+            throw new Error("حسابك بانتظار موافقة الإدارة. يرجى التواصل مع المسؤول لتفعيل الحساب.");
+          }
+
+          return {
+            id: String(user.id),
+            name: user.username,
+            email: user.email,
+            role: user.role,
+            mustChangePassword: user.mustChangePassword,
+          };
+        } catch (err: any) {
+          console.error("NextAuth authorize error:", err);
+          if (err.message && (err.message.includes("موافقة") || err.message.includes("persetujuan"))) {
+            throw err;
+          }
+          return null;
         }
-
-        return {
-          id: String(user.id),
-          name: user.username,
-          email: user.email,
-          role: user.role,
-          mustChangePassword: user.mustChangePassword,
-        };
       },
     }),
   ],
@@ -66,5 +72,7 @@ export const authOptions: AuthOptions = {
   },
   pages: {
     signIn: "/auth/signin",
+    error: "/auth/signin",
   },
 };
+

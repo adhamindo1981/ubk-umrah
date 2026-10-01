@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import fs from "fs";
 import path from "path";
 
-const prisma = new PrismaClient();
+
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);

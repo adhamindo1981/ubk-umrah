@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 
-const prisma = new PrismaClient();
+
 
 const MIN_PAYOUT_IDR = 500000; // Rp 500.000
 

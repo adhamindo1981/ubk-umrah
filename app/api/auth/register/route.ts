@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
 import { generateShortReferralCode } from "@/lib/referral";
 
-const prisma = new PrismaClient();
+
 
 /**
  * API route to register a new Marketer / User.
