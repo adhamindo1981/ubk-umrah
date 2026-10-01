@@ -105,7 +105,7 @@ export function UbkLogo({
 
         {showSubtitle && (
           <span
-            className={`font-bold tracking-wider uppercase truncate mt-1 ${subtitleSizes[size]} ${
+            className={`font-bold tracking-wider uppercase truncate mt-1 hidden sm:block ${subtitleSizes[size]} ${
               isDark ? "text-amber-400/90" : "text-emerald-800/90"
             }`}
           >

@@ -33,17 +33,17 @@ export function HomePageView() {
 
       {/* Navigation Bar */}
       <header className="border-b border-amber-500/20 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
           <Link href="/" className="hover:opacity-95 transition group shrink-0">
             <UbkLogo size="sm" variant="dark" animated={true} />
           </Link>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <LanguageSwitcher />
 
             <Link
               href="/auth/signin"
-              className="text-xs font-bold text-slate-300 hover:text-amber-400 transition px-2.5 sm:px-3 py-2 rounded-xl hover:bg-slate-900 border border-slate-800 inline-flex items-center gap-1 shrink-0"
+              className="text-xs font-bold text-slate-300 hover:text-amber-400 transition p-2 sm:px-3 sm:py-2 rounded-xl hover:bg-slate-900 border border-slate-800 inline-flex items-center gap-1 shrink-0"
               title={t("loginPartner")}
             >
               <span>🔐</span>
@@ -52,9 +52,10 @@ export function HomePageView() {
 
             <a
               href="#form-booking"
-              className="text-xs font-black bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500 hover:from-emerald-500 hover:to-amber-400 text-slate-950 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl shadow-lg shadow-emerald-950/50 transition-all duration-300 transform active:scale-95 relative overflow-hidden shrink-0"
+              className="text-[11px] sm:text-xs font-black bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500 hover:from-emerald-500 hover:to-amber-400 text-slate-950 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl shadow-lg shadow-emerald-950/50 transition-all duration-300 transform active:scale-95 relative overflow-hidden shrink-0 whitespace-nowrap"
             >
-              <span className="relative z-10 font-bold">{t("ctaRegister")}</span>
+              <span className="relative z-10 font-bold hidden sm:inline">{t("ctaRegister")}</span>
+              <span className="relative z-10 font-bold sm:hidden">{isArabic ? "حجز واستشارة" : "Daftar Umrah"}</span>
             </a>
           </div>
         </div>

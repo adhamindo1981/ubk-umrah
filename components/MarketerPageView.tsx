@@ -63,13 +63,13 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
             </span>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 text-sm">
+          <div className="flex items-center gap-1.5 sm:gap-3 text-sm shrink-0">
             <LanguageSwitcher />
 
             {/* Marketer Dashboard Login Entrance */}
             <Link
               href="/auth/signin"
-              className="text-xs font-bold text-amber-300/90 hover:text-amber-200 bg-slate-900/90 hover:bg-slate-800 border border-amber-500/30 hover:border-amber-400 px-2.5 sm:px-3.5 py-2 rounded-xl transition inline-flex items-center gap-1 shadow-sm shrink-0"
+              className="text-xs font-bold text-amber-300/90 hover:text-amber-200 bg-slate-900/90 hover:bg-slate-800 border border-amber-500/30 hover:border-amber-400 p-2 sm:px-3.5 sm:py-2 rounded-xl transition inline-flex items-center gap-1 shadow-sm shrink-0"
               title={isArabic ? "دخول المسوق إلى لوحة التحكم" : "Masuk ke Dasbor Mitra"}
             >
               <span>🔐</span>
@@ -80,10 +80,11 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
               href={waLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500 hover:from-emerald-500 hover:to-amber-400 text-slate-950 font-black text-xs px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-lg shadow-emerald-950/50 transition-all duration-300 transform active:scale-95 inline-flex items-center gap-1 shrink-0"
+              className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500 hover:from-emerald-500 hover:to-amber-400 text-slate-950 font-black text-[11px] sm:text-xs px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-lg shadow-emerald-950/50 transition-all duration-300 transform active:scale-95 inline-flex items-center gap-1 shrink-0 whitespace-nowrap"
             >
               <span>💬</span>
-              <span>{t("consultantWa")}</span>
+              <span className="hidden sm:inline">{t("consultantWa")}</span>
+              <span className="sm:hidden">{isArabic ? "تواصل واتساب" : "Chat WA"}</span>
             </a>
           </div>
         </div>
