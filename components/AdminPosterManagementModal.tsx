@@ -41,6 +41,8 @@ export function AdminPosterManagementModal() {
   const [publishMode, setPublishMode] = useState<"upload" | "studio">("upload");
   const [selectedFileBase64, setSelectedFileBase64] = useState<string>("");
   const [customImageUrl, setCustomImageUrl] = useState<string>("");
+  const [imageWidth, setImageWidth] = useState<number>(1080);
+  const [imageHeight, setImageHeight] = useState<number>(1350);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Template Form State
@@ -127,6 +129,13 @@ export function AdminPosterManagementModal() {
       const result = event.target?.result as string;
       const img = new Image();
       img.onload = () => {
+        const naturalW = img.naturalWidth || img.width;
+        const naturalH = img.naturalHeight || img.height;
+        if (naturalW > 0 && naturalH > 0) {
+          setImageWidth(naturalW);
+          setImageHeight(naturalH);
+        }
+
         const maxDim = 1200;
         let width = img.width;
         let height = img.height;
@@ -195,6 +204,8 @@ export function AdminPosterManagementModal() {
           bgEnd: colors.bgEnd,
           imageBase64: selectedFileBase64 || undefined,
           uploadedImageUrl: customImageUrl.trim() || undefined,
+          imageWidth,
+          imageHeight,
         }),
       });
 

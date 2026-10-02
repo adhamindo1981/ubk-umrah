@@ -7,91 +7,98 @@ import fs from "fs";
 import path from "path";
 
 /**
- * Generate SVG with Watermark for previewing
+ * Generate SVG with Watermark for previewing without cropping or distorting original artwork
  */
-function createWatermarkedSvgWrapper(imageUrl: string, title: string, category: string): { cleanSvg: string; previewSvg: string } {
-  // Determine aspect ratio dimensions based on category
-  let width = 1080;
-  let height = 1080;
-  let imgHeight = 940;
-  let slotY = 940;
-  let slotHeight = 140;
+function createWatermarkedSvgWrapper(
+  imageUrl: string,
+  title: string,
+  category: string,
+  imageWidth?: number,
+  imageHeight?: number
+): { cleanSvg: string; previewSvg: string } {
+  // Use exact pixel dimensions of the uploaded artwork
+  let artworkWidth = imageWidth && imageWidth > 200 ? imageWidth : 1080;
+  let artworkHeight = imageHeight && imageHeight > 200 ? imageHeight : (category === "INSTAGRAM_STORY" ? 1920 : 1350);
 
-  if (category === "INSTAGRAM_STORY") {
-    width = 1080;
-    height = 1920;
-    imgHeight = 1740;
-    slotY = 1740;
-    slotHeight = 180;
-  } else if (category === "BANNER") {
-    width = 1920;
-    height = 1080;
-    imgHeight = 930;
-    slotY = 930;
-    slotHeight = 150;
+  // Ensure standard scale if width is smaller
+  if (artworkWidth < 600) {
+    const scale = 1080 / artworkWidth;
+    artworkWidth = 1080;
+    artworkHeight = Math.round(artworkHeight * scale);
   }
 
+  // Footer branding height proportionally calculated (approx 12-14% of width)
+  const slotHeight = Math.max(130, Math.round(artworkWidth * 0.13));
+  const width = artworkWidth;
+  const totalHeight = artworkHeight + slotHeight;
+  const slotY = artworkHeight;
+
+  // Scale font sizes based on width (base 1080)
+  const fontScale = width / 1080;
+  const qrSize = slotHeight - 24;
+
   const watermarkOverlay = `
-    <g transform="rotate(-32 ${width / 2} ${height / 2})" opacity="0.32">
-      <rect x="-300" y="${height / 2 - 60}" width="${width + 600}" height="120" fill="rgba(220, 38, 38, 0.3)" rx="20"/>
-      <text x="${width / 2}" y="${height / 2 + 15}" font-family="Arial, sans-serif" font-size="40" font-weight="900" fill="#dc2626" text-anchor="middle" letter-spacing="4">
-        UBK UMRAH • PRATINJAU DESAIN RESMI • HAK CIPTA DILINDUNGI
+    <g transform="rotate(-30 ${width / 2} ${artworkHeight / 2})" opacity="0.32">
+      <rect x="-400" y="${artworkHeight / 2 - 50 * fontScale}" width="${width + 800}" height="${100 * fontScale}" fill="rgba(220, 38, 38, 0.3)" rx="20"/>
+      <text x="${width / 2}" y="${artworkHeight / 2 + 15 * fontScale}" font-family="Arial, sans-serif" font-size="${34 * fontScale}" font-weight="900" fill="#dc2626" text-anchor="middle" letter-spacing="4">
+        UBK UMRAH • PRATINJAU RESMI • DILARANG MENYALIN
       </text>
     </g>
   `;
 
   const brandingSlot = `
     <g id="marketer-branding-slot">
-      <!-- Dark Emerald & Gold Luxury Footer Strip -->
-      <rect x="0" y="${slotY}" width="${width}" height="${slotHeight}" fill="#022c22" stroke="#d97706" stroke-width="3"/>
+      <!-- Dark Emerald & Gold Luxury Footer Strip attached cleanly below artwork -->
+      <rect x="0" y="${slotY}" width="${width}" height="${slotHeight}" fill="#022c22" stroke="#d97706" stroke-width="2"/>
       
       <!-- Marketer QR Code Slot (Dynamic) -->
-      <g transform="translate(30, ${slotY + 15})">
-        <rect width="${slotHeight - 30}" height="${slotHeight - 30}" rx="12" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
-        <image id="branding-qr" href="{{MARKETER_QR}}" x="4" y="4" width="${slotHeight - 38}" height="${slotHeight - 38}" preserveAspectRatio="xMidYMid meet"/>
+      <g transform="translate(${20 * fontScale}, ${slotY + 12})">
+        <rect width="${qrSize}" height="${qrSize}" rx="${12 * fontScale}" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
+        <image id="branding-qr" href="{{MARKETER_QR}}" x="4" y="4" width="${qrSize - 8}" height="${qrSize - 8}" preserveAspectRatio="xMidYMid meet"/>
       </g>
 
       <!-- Marketer Profile Info -->
-      <g transform="translate(${slotHeight + 25}, ${slotY + 35})">
-        <text font-family="'Cairo', sans-serif" font-size="14" font-weight="800" fill="#fbbf24" letter-spacing="1">
+      <g transform="translate(${qrSize + 36 * fontScale}, ${slotY + 34 * fontScale})">
+        <text font-family="'Cairo', sans-serif" font-size="${14 * fontScale}" font-weight="800" fill="#fbbf24" letter-spacing="1">
           KONSULTAN RESMI BERLISENSI / المسوق المعتمد:
         </text>
-        <text id="branding-name" y="32" font-family="'Plus Jakarta Sans', sans-serif" font-size="24" font-weight="900" fill="#ffffff">
+        <text id="branding-name" y="${28 * fontScale}" font-family="'Plus Jakarta Sans', sans-serif" font-size="${23 * fontScale}" font-weight="900" fill="#ffffff">
           {{MARKETER_NAME}}
         </text>
-        <text id="branding-wa" y="62" font-family="monospace" font-size="16" font-weight="700" fill="#34d399">
+        <text id="branding-wa" y="${56 * fontScale}" font-family="monospace" font-size="${15 * fontScale}" font-weight="700" fill="#34d399">
           📲 WhatsApp: {{MARKETER_WHATSAPP}} | Kode: {{MARKETER_CODE}}
         </text>
       </g>
 
       <!-- Security Digital License Badge -->
-      <g transform="translate(${width - 270}, ${slotY + 22})">
-        <rect width="245" height="${slotHeight - 44}" rx="16" fill="rgba(15, 23, 42, 0.85)" stroke="#fbbf24" stroke-width="1.5"/>
-        <text x="122" y="24" font-family="sans-serif" font-size="11" font-weight="800" fill="#94a3b8" text-anchor="middle">
+      <g transform="translate(${width - 260 * fontScale}, ${slotY + 18 * fontScale})">
+        <rect width="${240 * fontScale}" height="${slotHeight - 36 * fontScale}" rx="${14 * fontScale}" fill="rgba(15, 23, 42, 0.85)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="${120 * fontScale}" y="${22 * fontScale}" font-family="sans-serif" font-size="${11 * fontScale}" font-weight="800" fill="#94a3b8" text-anchor="middle">
           LISENSI RESMI UBK UMRAH
         </text>
-        <text id="branding-lic" x="122" y="48" font-family="monospace" font-size="12" font-weight="900" fill="#fef08a" text-anchor="middle">
+        <text id="branding-lic" x="${120 * fontScale}" y="${45 * fontScale}" font-family="monospace" font-size="${12 * fontScale}" font-weight="900" fill="#fef08a" text-anchor="middle">
           {{LICENSE_KEY}}
         </text>
-        <text x="122" y="70" font-family="sans-serif" font-size="9" font-weight="700" fill="#34d399" text-anchor="middle">
+        <text x="${120 * fontScale}" y="${66 * fontScale}" font-family="sans-serif" font-size="${9 * fontScale}" font-weight="700" fill="#34d399" text-anchor="middle">
           PPIU Kemenag No. U-271/2021
         </text>
       </g>
     </g>
   `;
 
+  // Preserve 100% of designer artwork dimensions without slicing or stretching
   const cleanSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
-      <!-- Designer's Master Artwork -->
-      <image href="${imageUrl}" x="0" y="0" width="${width}" height="${imgHeight}" preserveAspectRatio="xMidYMid slice" />
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${width} ${totalHeight}" width="${width}" height="${totalHeight}">
+      <!-- Designer's Master Artwork: 100% UNTOUCHED, ZERO CROPPING -->
+      <image href="${imageUrl}" x="0" y="0" width="${width}" height="${artworkHeight}" preserveAspectRatio="xMidYMid meet" />
       ${brandingSlot}
     </svg>
   `.trim();
 
   const previewSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
-      <!-- Designer's Master Artwork -->
-      <image href="${imageUrl}" x="0" y="0" width="${width}" height="${imgHeight}" preserveAspectRatio="xMidYMid slice" />
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${width} ${totalHeight}" width="${width}" height="${totalHeight}">
+      <!-- Designer's Master Artwork: 100% UNTOUCHED, ZERO CROPPING -->
+      <image href="${imageUrl}" x="0" y="0" width="${width}" height="${artworkHeight}" preserveAspectRatio="xMidYMid meet" />
       ${brandingSlot}
       ${watermarkOverlay}
     </svg>
@@ -211,6 +218,8 @@ export async function POST(req: Request) {
       bgEnd,
       imageBase64,
       uploadedImageUrl,
+      imageWidth,
+      imageHeight,
     } = body;
 
     if (!title || posterPrice === undefined || posterPrice === null) {
@@ -253,7 +262,9 @@ export async function POST(req: Request) {
       const { cleanSvg, previewSvg } = createWatermarkedSvgWrapper(
         finalImageUrl,
         title,
-        category || "INSTAGRAM_FEED"
+        category || "INSTAGRAM_FEED",
+        imageWidth ? Number(imageWidth) : undefined,
+        imageHeight ? Number(imageHeight) : undefined
       );
       cleanImageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(cleanSvg)}`;
       previewImageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(previewSvg)}`;

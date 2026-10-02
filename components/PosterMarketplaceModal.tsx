@@ -367,12 +367,12 @@ export function PosterMarketplaceModal() {
                         className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between transition hover:shadow-md"
                       >
                         {/* Poster Preview Container with IP Protection */}
-                        <div className="relative group bg-slate-900 select-none overflow-hidden aspect-square">
+                        <div className="relative group bg-slate-950 select-none overflow-hidden min-h-[280px] flex items-center justify-center p-2">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={displayImage}
                             alt={template.title}
-                            className="w-full h-full object-cover transition duration-300 group-hover:scale-[1.02]"
+                            className="w-full h-auto max-h-[400px] object-contain rounded-lg transition duration-300 group-hover:scale-[1.01]"
                             onContextMenu={(e) => e.preventDefault()}
                           />
 

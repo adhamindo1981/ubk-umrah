@@ -302,12 +302,12 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
                   className="bg-slate-950 rounded-2xl border border-amber-500/20 hover:border-amber-400/60 overflow-hidden shadow-xl hover:shadow-2xl transition duration-300 cursor-pointer group flex flex-col"
                   onClick={() => setActiveZoomPoster(poster)}
                 >
-                  <div className="relative overflow-hidden aspect-square bg-slate-900">
+                  <div className="relative overflow-hidden bg-slate-900 min-h-[260px] flex items-center justify-center p-2">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={poster.imageUrl}
                       alt={poster.title}
-                      className="w-full h-full object-cover transition duration-500 group-hover:scale-105"
+                      className="w-full h-auto max-h-[380px] object-contain rounded-lg transition duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
                       <span className="bg-amber-400 text-slate-950 text-xs font-black px-4 py-2 rounded-xl shadow-lg">
