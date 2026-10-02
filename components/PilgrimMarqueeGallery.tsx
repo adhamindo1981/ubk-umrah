@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { IslamicPattern } from "@/components/IslamicPattern";
+import { normalizeImageUrl } from "@/lib/imageUtils";
 
 export interface PilgrimPhotoItem {
   id: number;
@@ -140,9 +141,21 @@ export function PilgrimMarqueeGallery() {
                 {/* Photo Image */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={photo.imageUrl}
+                  src={normalizeImageUrl(photo.imageUrl)}
                   alt={displayTitle}
                   className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (!target.dataset.tried) {
+                      target.dataset.tried = "true";
+                      const match = photo.imageUrl.match(/([a-zA-Z0-9_-]{25,})/);
+                      if (match) {
+                        target.src = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1600`;
+                        return;
+                      }
+                    }
+                    target.src = "/images/landmarks/madinah-nabawi.jpg";
+                  }}
                 />
 
                 {/* Multi-layered Vignette */}
@@ -204,9 +217,17 @@ export function PilgrimMarqueeGallery() {
             <div className="relative max-h-[70vh] bg-black flex items-center justify-center overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={activeZoomPhoto.imageUrl}
+                src={normalizeImageUrl(activeZoomPhoto.imageUrl)}
                 alt={isArabic && activeZoomPhoto.titleAr ? activeZoomPhoto.titleAr : activeZoomPhoto.title}
                 className="w-full h-auto max-h-[70vh] object-contain"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  const match = activeZoomPhoto.imageUrl.match(/([a-zA-Z0-9_-]{25,})/);
+                  if (match && !target.dataset.tried) {
+                    target.dataset.tried = "true";
+                    target.src = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1600`;
+                  }
+                }}
               />
 
               <button

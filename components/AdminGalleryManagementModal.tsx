@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { IslamicPattern } from "@/components/IslamicPattern";
+import { normalizeImageUrl } from "@/lib/imageUtils";
 
 export interface GalleryPhoto {
   id: number;
@@ -370,9 +371,17 @@ export function AdminGalleryManagementModal() {
                         <div className="relative h-44 w-full bg-black">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={photo.imageUrl}
+                            src={normalizeImageUrl(photo.imageUrl)}
                             alt={photo.title}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.currentTarget;
+                              const match = photo.imageUrl.match(/([a-zA-Z0-9_-]{25,})/);
+                              if (match && !target.dataset.tried) {
+                                target.dataset.tried = "true";
+                                target.src = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1600`;
+                              }
+                            }}
                           />
                           <div className="absolute top-2.5 start-2.5">
                             <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-900/80 text-amber-300 border border-amber-500/30 backdrop-blur-xs">

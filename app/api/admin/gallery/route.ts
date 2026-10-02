@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
+import { normalizeImageUrl } from "@/lib/imageUtils";
 import fs from "fs";
 import path from "path";
 
@@ -22,9 +23,13 @@ export async function GET() {
   }
 
   try {
-    const photos = await prisma.pilgrimPhoto.findMany({
+    const rawPhotos = await prisma.pilgrimPhoto.findMany({
       orderBy: [{ sortOrder: "asc" }, { id: "desc" }],
     });
+    const photos = rawPhotos.map((p) => ({
+      ...p,
+      imageUrl: normalizeImageUrl(p.imageUrl),
+    }));
     return NextResponse.json({ success: true, photos });
   } catch (error: any) {
     return NextResponse.json({ error: "Gagal mengambil data galeri" }, { status: 500 });
@@ -41,7 +46,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { title, titleAr, category, categoryAr, imageBase64, imageUrl, location, year } = body;
 
-    let finalImageUrl = imageUrl || "";
+    let finalImageUrl = normalizeImageUrl(imageUrl) || "";
 
     // If an image file base64 data URL is uploaded, save it to public/uploads/gallery
     if (imageBase64 && imageBase64.startsWith("data:image")) {
