@@ -145,17 +145,15 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
               <span>{t("ctaRegister")}</span>
             </a>
 
-            {/* Join Sub-Marketer Team WhatsApp */}
-            <a
-              href={joinSubMarketerWaLink}
-              target="_blank"
-              rel="noopener noreferrer"
+            {/* Join Sub-Marketer Landing Page */}
+            <Link
+              href={`/mitra?ref=${marketer.referralCode}`}
               onClick={() => setMobileMenuOpen(false)}
               className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-900 border border-amber-400/40 text-amber-300 font-bold text-xs hover:bg-slate-850 transition"
             >
               <span>🤝</span>
               <span>{t("ctaJoinSubMarketer")}</span>
-            </a>
+            </Link>
 
             {/* Marketer Portal Login Button */}
             <Link
@@ -261,14 +259,12 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
               </span>
             </a>
 
-            <a
-              href={joinSubMarketerWaLink}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href={`/mitra?ref=${marketer.referralCode}`}
               className="w-full sm:w-auto bg-slate-900/90 hover:bg-slate-900 border-2 border-amber-400/50 hover:border-amber-400 text-amber-300 hover:text-amber-200 px-8 py-4 rounded-2xl font-black text-sm shadow-xl shadow-black/40 backdrop-blur-md transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>{t("ctaJoinSubMarketer")}</span>
-            </a>
+            </Link>
           </div>
         </div>
       </section>
