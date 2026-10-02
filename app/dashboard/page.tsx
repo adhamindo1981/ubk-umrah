@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { generateQRCodeDataUrl } from "@/lib/referral";
 import { DashboardPageView } from "@/components/DashboardPageView";
@@ -53,8 +54,20 @@ export default async function DashboardPage() {
 
   const availableIDR = Math.max(0, totalEarnedIDR - totalRedeemedIDR - totalPosterPurchasesIDR);
 
+  // Dynamically resolve base URL from request headers or environment
+  const headersList = headers();
+  const rawHost =
+    headersList.get("x-forwarded-host") ||
+    headersList.get("host") ||
+    process.env.VERCEL_URL ||
+    "ubk-umrah.vercel.app";
+  const proto =
+    headersList.get("x-forwarded-proto") ||
+    (rawHost.includes("localhost") ? "http" : "https");
+  const baseUrl = rawHost.startsWith("http") ? rawHost : `${proto}://${rawHost}`;
+
   // Personal page and share link
-  const personalPageUrl = user.referralCode ? `http://localhost:3000/m/${user.referralCode}` : "";
+  const personalPageUrl = user.referralCode ? `${baseUrl}/m/${user.referralCode}` : "";
   const waShareText = encodeURIComponent(
     `Assalamu'alaikum wr. wb.,\nDaftarkan ibadah Umrah Anda bersama UBK Umrah (Umar Bin Alkhattab for Umrah) melalui halaman resmi kemitraan saya:\n${personalPageUrl}\n\n----------------------------------------\n\nالسلام عليكم ورحمة الله وبركاته،\nيمكنكم الاطلاع على تفاصيل برامج العمرة وطلب الحجز المباشر عبر صفحتي المعتمدة لدى عمر بن الخطاب للعمرة (UBK):\n${personalPageUrl}`
   );

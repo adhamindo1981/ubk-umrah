@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 import { MarketerPageView } from "@/components/MarketerPageView";
-
-const prisma = new PrismaClient();
 
 interface MarketerPageProps {
   params: {

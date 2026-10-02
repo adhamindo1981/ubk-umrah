@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import QRCode from "qrcode";
 import { useLanguage } from "@/lib/LanguageContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { BackButton } from "@/components/BackButton";
@@ -75,6 +76,44 @@ export function DashboardPageView({
 }: DashboardPageViewProps) {
   const { t, isArabic } = useLanguage();
   const [activeReceiptPayout, setActiveReceiptPayout] = useState<any | null>(null);
+  const [copied, setCopied] = useState<boolean>(false);
+  const [activeUrl, setActiveUrl] = useState<string>(personalPageUrl);
+  const [activeWaLink, setActiveWaLink] = useState<string>(waLink);
+  const [activeQrCode, setActiveQrCode] = useState<string>(qrCodeDataUrl);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && user.referralCode) {
+      const origin = window.location.origin;
+      const clientUrl = `${origin}/m/${user.referralCode}`;
+      setActiveUrl(clientUrl);
+      const text = encodeURIComponent(
+        `Assalamu'alaikum wr. wb.,\nDaftarkan ibadah Umrah Anda bersama UBK Umrah (Umar Bin Alkhattab for Umrah) melalui halaman resmi kemitraan saya:\n${clientUrl}\n\n----------------------------------------\n\nالسلام عليكم ورحمة الله وبركاته،\nيمكنكم الاطلاع على تفاصيل برامج العمرة وطلب الحجز المباشر عبر صفحتي المعتمدة لدى عمر بن الخطاب للعمرة (UBK):\n${clientUrl}`
+      );
+      setActiveWaLink(`https://wa.me/?text=${text}`);
+
+      QRCode.toDataURL(clientUrl, {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: "#047857",
+          light: "#FFFFFF",
+        },
+      })
+        .then((url) => setActiveQrCode(url))
+        .catch((err) => console.error("Client QR generation error:", err));
+    }
+  }, [user.referralCode]);
+
+  const handleCopyLink = async () => {
+    if (!activeUrl) return;
+    try {
+      await navigator.clipboard.writeText(activeUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch (err) {
+      console.error("Clipboard copy error:", err);
+    }
+  };
 
   return (
     <div
@@ -189,24 +228,41 @@ export function DashboardPageView({
               </span>
               {personalPageUrl ? (
                 <>
-                  <div className="bg-slate-100 p-3 rounded-xl border border-slate-200 text-xs font-mono text-slate-700 break-all mb-3 font-semibold" dir="ltr">
-                    {personalPageUrl}
+                  <div className="bg-slate-100 p-3 rounded-xl border border-slate-200 text-xs font-mono text-slate-700 break-all mb-3 font-semibold flex items-center justify-between gap-2" dir="ltr">
+                    <span className="truncate">{activeUrl}</span>
+                    <button
+                      type="button"
+                      onClick={handleCopyLink}
+                      className="shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 transition shadow-2xs cursor-pointer active:scale-95"
+                    >
+                      {copied ? (isArabic ? "✅ تم النسخ!" : "✅ Tersalin!") : (isArabic ? "📋 نسخ" : "📋 Salin")}
+                    </button>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     <Link
                       href={`/m/${user.referralCode}`}
                       target="_blank"
-                      className="w-full text-center text-xs font-bold py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition"
+                      className="col-span-1 text-center text-xs font-bold py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition inline-flex items-center justify-center gap-1 shadow-2xs"
                     >
-                      {t("visitWebPage")}
+                      <span>🌐</span>
+                      <span>{t("visitWebPage")}</span>
                     </Link>
+                    <button
+                      type="button"
+                      onClick={handleCopyLink}
+                      className="col-span-1 text-center text-xs font-bold py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded-xl transition inline-flex items-center justify-center gap-1 shadow-2xs cursor-pointer active:scale-95"
+                    >
+                      <span>{copied ? "✅" : "📋"}</span>
+                      <span>{copied ? (isArabic ? "تم النسخ!" : "Tersalin!") : (isArabic ? "نسخ الرابط" : "Salin")}</span>
+                    </button>
                     <a
-                      href={waLink}
+                      href={activeWaLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-center text-xs font-bold px-3 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition shrink-0"
+                      className="col-span-2 sm:col-span-1 text-center text-xs font-bold py-2.5 bg-emerald-950 hover:bg-slate-900 text-emerald-300 border border-emerald-800 rounded-xl transition inline-flex items-center justify-center gap-1 shadow-2xs"
                     >
-                      {t("shareWa")}
+                      <span>💬</span>
+                      <span>{t("shareWa")}</span>
                     </a>
                   </div>
                 </>
@@ -250,25 +306,29 @@ export function DashboardPageView({
         </div>
 
         {/* Section: QR Code & Marketing Assets */}
-        {qrCodeDataUrl && (
+        {activeQrCode && (
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-6">
             <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={qrCodeDataUrl} alt="QR Code" className="w-36 h-36 rounded-xl" />
+              <img src={activeQrCode} alt="QR Code" className="w-36 h-36 rounded-xl" />
             </div>
             <div className="space-y-2 text-start">
               <h3 className="text-base font-bold text-slate-900">{t("qrTitle")}</h3>
               <p className="text-xs text-slate-500 max-w-lg leading-relaxed">
                 {t("qrDesc")}
               </p>
-              <div className="pt-1">
+              <div className="pt-1 flex flex-wrap items-center gap-2">
                 <a
-                  href={qrCodeDataUrl}
+                  href={activeQrCode}
                   download={`QR-UBK-${user.referralCode}.png`}
-                  className="inline-block bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm"
+                  className="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm"
                 >
-                  {t("downloadQr")}
+                  <span>⬇️</span>
+                  <span>{t("downloadQr")}</span>
                 </a>
+                <span className="text-[11px] text-slate-400 font-mono" dir="ltr">
+                  {activeUrl}
+                </span>
               </div>
             </div>
           </div>
