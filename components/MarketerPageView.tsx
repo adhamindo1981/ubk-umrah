@@ -49,9 +49,7 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
 
   // Pre-filled WhatsApp message for joining as a Sub-Marketer under this marketer's team
   const joinSubMarketerWaText = encodeURIComponent(
-    isArabic
-      ? `السلام عليكم ورحمة الله وبركاته أ/ ${marketer.username}، اطلعت على صفحتك التسويقية لدى UBK للعمرة وأرغب في الانضمام ضمن فريقك كمسوّق فرعي تحت إشرافك (كود الإحالة: ${marketer.referralCode}). يرجى تزويدي برابط ورقم الدعوة للتسجيل.`
-      : `Assalamu'alaikum Bapak/Ibu ${marketer.username}, saya tertarik dan ingin bergabung menjadi bagian dari tim pemasaran Anda sebagai Sub-Marketer UBK Umrah (Kode Referal: ${marketer.referralCode}). Mohon dikirimkan tautan undangannya. Terima kasih.`
+    `Assalamu'alaikum Bapak/Ibu ${marketer.username}, saya tertarik dan ingin bergabung menjadi bagian dari tim pemasaran Anda sebagai Sub-Marketer UBK Umrah (Kode Referal: ${marketer.referralCode}). Mohon dikirimkan tautan undangannya. Terima kasih.\n\n----------------------------------------\n\nالسلام عليكم ورحمة الله وبركاته أ/ ${marketer.username}، اطلعت على صفحتك التسويقية لدى UBK للعمرة وأرغب في الانضمام ضمن فريقك كمسوّق فرعي تحت إشرافك (كود الإحالة: ${marketer.referralCode}). يرجى تزويدي برابط ورقم الدعوة للتسجيل.`
   );
   const joinSubMarketerWaLink = `https://wa.me/${waNumber}?text=${joinSubMarketerWaText}`;
 

@@ -25,9 +25,7 @@ export function HomePageView() {
   const companyWaLink = `https://wa.me/6285110539752?text=${homeWaText}`;
 
   const joinDirectMarketerWaText = encodeURIComponent(
-    isArabic
-      ? "السلام عليكم ورحمة الله وبركاته، أرغب في الانضمام كمسوّق مباشر معتمد لدى شركة عمر بن الخطاب للعمرة (UBK). يرجى التكرم بتزويدي برابط ورقم الدعوة للتسجيل في النظام."
-      : "Assalamu'alaikum wr. wb., Saya tertarik dan ingin mendaftar sebagai Mitra Pemasar Langsung (Marketer Resmi) di UBK Umrah. Mohon informasi dan tautan undangan pendaftarannya. Terima kasih."
+    `Assalamu'alaikum wr. wb., Saya tertarik dan ingin mendaftar sebagai Mitra Pemasar Langsung (Marketer Resmi) di UBK Umrah. Mohon informasi dan tautan undangan pendaftarannya. Terima kasih.\n\n----------------------------------------\n\nالسلام عليكم ورحمة الله وبركاته، أرغب في الانضمام كمسوّق مباشر معتمد لدى شركة عمر بن الخطاب للعمرة (UBK). يرجى التكرم بتزويدي برابط ورقم الدعوة للتسجيل في النظام.`
   );
   const joinDirectMarketerWaLink = `https://wa.me/6285110539752?text=${joinDirectMarketerWaText}`;
 
