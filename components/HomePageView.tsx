@@ -24,6 +24,13 @@ export function HomePageView() {
   );
   const companyWaLink = `https://wa.me/6285110539752?text=${homeWaText}`;
 
+  const joinDirectMarketerWaText = encodeURIComponent(
+    isArabic
+      ? "السلام عليكم ورحمة الله وبركاته، أرغب في الانضمام كمسوّق مباشر معتمد لدى شركة عمر بن الخطاب للعمرة (UBK). يرجى التكرم بتزويدي برابط ورقم الدعوة للتسجيل في النظام."
+      : "Assalamu'alaikum wr. wb., Saya tertarik dan ingin mendaftar sebagai Mitra Pemasar Langsung (Marketer Resmi) di UBK Umrah. Mohon informasi dan tautan undangan pendaftarannya. Terima kasih."
+  );
+  const joinDirectMarketerWaLink = `https://wa.me/6285110539752?text=${joinDirectMarketerWaText}`;
+
   return (
     <div
       className="min-h-screen bg-slate-950 text-slate-100 font-sans transition-all selection:bg-amber-400 selection:text-slate-950"
@@ -106,6 +113,18 @@ export function HomePageView() {
               <span>{t("loginPartner")}</span>
             </Link>
 
+            {/* Join as Direct Marketer WhatsApp */}
+            <a
+              href={joinDirectMarketerWaLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-900 border border-amber-400/40 text-amber-300 font-bold text-xs hover:bg-slate-850 transition"
+            >
+              <span>🤝</span>
+              <span>{t("ctaPartner")}</span>
+            </a>
+
             {/* Direct Company WhatsApp Chat */}
             <a
               href={companyWaLink}
@@ -156,12 +175,14 @@ export function HomePageView() {
               </span>
             </a>
 
-            <Link
-              href="/auth/signin"
-              className="w-full sm:w-auto bg-slate-900/90 hover:bg-slate-900 border-2 border-amber-400/50 hover:border-amber-400 text-amber-300 hover:text-amber-200 px-8 py-4 rounded-2xl font-black text-sm shadow-xl shadow-black/40 backdrop-blur-md transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2"
+            <a
+              href={joinDirectMarketerWaLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto bg-slate-900/90 hover:bg-slate-900 border-2 border-amber-400/50 hover:border-amber-400 text-amber-300 hover:text-amber-200 px-8 py-4 rounded-2xl font-black text-sm shadow-xl shadow-black/40 backdrop-blur-md transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>{t("ctaPartner")}</span>
-            </Link>
+            </a>
           </div>
         </div>
       </section>

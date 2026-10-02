@@ -48,6 +48,7 @@ export const translations = {
     heroSubtitle: "Penyelenggara perjalanan ibadah Umrah terpercaya di Indonesia dengan bimbingan ibadah sesuai Sunnah, hotel dekat Masjid, dan fasilitas prima.",
     ctaRegister: "Konsultasi & Pendaftaran Jamaah",
     ctaPartner: "Gabung Bersama Kami Sebagai Pemasar & Dapatkan Komisi Menarik 🤝",
+    ctaJoinSubMarketer: "Gabung Tim Saya Sebagai Sub-Marketer 🤝",
     yourConsultant: "Konsultan Resmi Anda",
     partnerCode: "Kode Kemitraan",
 
@@ -280,6 +281,7 @@ export const translations = {
     heroSubtitle: "أرقى خدمات وبرامج العمرة المتكاملة في إندونيسيا بإشراف مرشدين معتمدين وفنادق مميزة مجاورة للحرمين الشريفين.",
     ctaRegister: "طلب استفسار وتسجيل حجز",
     ctaPartner: "انظم إلينا كمسوق واحصل على مكافأة مالية 🤝",
+    ctaJoinSubMarketer: "انضم لفريقي كمسوّق فرعي واحصل على مكافأة 🤝",
     yourConsultant: "مستشارك ومسؤول حجزك المعتمد",
     partnerCode: "كود المسوّق",
 

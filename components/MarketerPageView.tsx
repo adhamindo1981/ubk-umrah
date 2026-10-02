@@ -47,6 +47,14 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
   );
   const waLink = `https://wa.me/${waNumber}?text=${waText}`;
 
+  // Pre-filled WhatsApp message for joining as a Sub-Marketer under this marketer's team
+  const joinSubMarketerWaText = encodeURIComponent(
+    isArabic
+      ? `السلام عليكم ورحمة الله وبركاته أ/ ${marketer.username}، اطلعت على صفحتك التسويقية لدى UBK للعمرة وأرغب في الانضمام ضمن فريقك كمسوّق فرعي تحت إشرافك (كود الإحالة: ${marketer.referralCode}). يرجى تزويدي برابط ورقم الدعوة للتسجيل.`
+      : `Assalamu'alaikum Bapak/Ibu ${marketer.username}, saya tertarik dan ingin bergabung menjadi bagian dari tim pemasaran Anda sebagai Sub-Marketer UBK Umrah (Kode Referal: ${marketer.referralCode}). Mohon dikirimkan tautan undangannya. Terima kasih.`
+  );
+  const joinSubMarketerWaLink = `https://wa.me/${waNumber}?text=${joinSubMarketerWaText}`;
+
   return (
     <div
       className="min-h-screen bg-slate-950 text-slate-100 font-sans transition-all selection:bg-amber-400 selection:text-slate-950"
@@ -137,6 +145,18 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
             >
               <span>🕋</span>
               <span>{t("ctaRegister")}</span>
+            </a>
+
+            {/* Join Sub-Marketer Team WhatsApp */}
+            <a
+              href={joinSubMarketerWaLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-900 border border-amber-400/40 text-amber-300 font-bold text-xs hover:bg-slate-850 transition"
+            >
+              <span>🤝</span>
+              <span>{t("ctaJoinSubMarketer")}</span>
             </a>
 
             {/* Marketer Portal Login Button */}
@@ -231,7 +251,7 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
             </a>
           </div>
 
-          {/* Quick CTA to Form */}
+          {/* Quick CTA to Form & Join Team */}
           <div className="pt-2 flex flex-col sm:flex-row justify-center items-center gap-4">
             <a
               href="#form-booking"
@@ -241,6 +261,15 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
                 <span>{t("ctaRegister")}</span>
                 <span>🕋</span>
               </span>
+            </a>
+
+            <a
+              href={joinSubMarketerWaLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto bg-slate-900/90 hover:bg-slate-900 border-2 border-amber-400/50 hover:border-amber-400 text-amber-300 hover:text-amber-200 px-8 py-4 rounded-2xl font-black text-sm shadow-xl shadow-black/40 backdrop-blur-md transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>{t("ctaJoinSubMarketer")}</span>
             </a>
           </div>
         </div>
