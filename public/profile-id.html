@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="id" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dokumen Profil Eksekutif - Umar Bin Alkhattab for Umrah (UBK)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: A4;
+      margin: 12mm 14mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #ffffff;
+      color: #0f172a;
+      line-height: 1.5;
+      font-size: 10pt;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page {
+      page-break-after: always;
+      position: relative;
+      padding: 8px 0;
+    }
+    .page:last-child {
+      page-break-after: auto;
+    }
+    
+    /* Cover Page */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 250mm;
+      background: linear-gradient(135deg, #022c22 0%, #064e3b 50%, #022c22 100%);
+      color: #ffffff;
+      border-radius: 20px;
+      padding: 35px 25px;
+      border: 3px solid #d97706;
+      position: relative;
+      overflow: hidden;
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 18px;
+      background: rgba(217, 119, 6, 0.25);
+      border: 1px solid #fbbf24;
+      color: #fef08a;
+      border-radius: 9999px;
+      font-weight: 800;
+      font-size: 10pt;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+    .cover h1 {
+      font-size: 28pt;
+      font-weight: 900;
+      margin-bottom: 10px;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+    .cover h2 {
+      font-size: 15pt;
+      font-weight: 700;
+      color: #fbbf24;
+      margin-bottom: 18px;
+      line-height: 1.4;
+    }
+    .cover p {
+      font-size: 11pt;
+      color: #e2e8f0;
+      max-width: 620px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 680px;
+      margin-top: 15px;
+    }
+    .meta-box {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      padding: 12px 8px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .meta-box span {
+      display: block;
+      font-size: 8.5pt;
+      color: #94a3b8;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .meta-box strong {
+      font-size: 9.5pt;
+      color: #f8fafc;
+      font-weight: 800;
+    }
+
+    /* Content Sections */
+    .section {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+    .section-icon {
+      font-size: 18pt;
+      background: #fef3c7;
+      color: #b45309;
+      padding: 6px 12px;
+      border-radius: 12px;
+      border: 1px solid #fde68a;
+    }
+    .section-title h2 {
+      font-size: 14pt;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .section-title p {
+      font-size: 8.5pt;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    /* Grids & Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .card-title {
+      font-weight: 800;
+      font-size: 10pt;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-desc {
+      font-size: 8.5pt;
+      color: #475569;
+      line-height: 1.5;
+    }
+    .card-solution {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed #cbd5e1;
+      font-size: 8.5pt;
+      color: #065f46;
+      font-weight: 600;
+    }
+
+    /* Commission Cards */
+    .comm-card {
+      text-align: center;
+      padding: 18px 12px;
+      border-radius: 14px;
+      border: 2px solid;
+    }
+    .comm-card.primary {
+      background: #ecfdf5;
+      border-color: #10b981;
+    }
+    .comm-card.secondary {
+      background: #fffbeb;
+      border-color: #f59e0b;
+    }
+    .comm-val {
+      font-size: 22pt;
+      font-weight: 900;
+      margin: 8px 0;
+      font-family: monospace;
+    }
+    .comm-primary { color: #047857; }
+    .comm-secondary { color: #b45309; }
+
+    /* Highlights */
+    .callout {
+      background: #022c22;
+      color: #ffffff;
+      padding: 16px;
+      border-radius: 12px;
+      border-left: 4px solid #fbbf24;
+      margin-top: 12px;
+      font-size: 9pt;
+      line-height: 1.6;
+    }
+    .callout strong {
+      color: #fef08a;
+    }
+
+    /* Footer */
+    .doc-footer {
+      text-align: center;
+      font-size: 8pt;
+      color: #64748b;
+      padding: 14px;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= PAGE 1: COVER ================= -->
+  <div class="page">
+    <div class="cover">
+      <div class="badge">🕋 DOKUMEN PROFIL EKSEKUTIF RESMI 🕋</div>
+      
+      <!-- Logo Simulation -->
+      <div style="font-size: 32pt; margin-bottom: 8px;">🏛️</div>
+      <h1>PT. UMAR BIN AL-KHATTAB FOR UMRAH (UBK)</h1>
+      <h2>Platform Digital Terpadu Manajemen Program Umrah & Kemitraan Afiliasi</h2>
+      
+      <p>
+        Transformasi Digital Tepercaya untuk Perjalanan Ibadah Umrah dan Tata Kelola Jaringan Pemasaran Afiliasi Mandiri Terbesar di Republik Indonesia.
+        <br><br>
+        <strong>Transparansi Finansial • Kepatuhan 5 Pasti Umrah • Kebebasan Kerja Mandiri</strong>
+      </p>
+
+      <div class="meta-grid">
+        <div class="meta-box">
+          <span>Izin Resmi PPIU</span>
+          <strong style="color: #34d399;">Kemenag No. U-271/2021</strong>
+        </div>
+        <div class="meta-box">
+          <span>Kantor Operasional</span>
+          <strong>Bogor, Jawa Barat</strong>
+        </div>
+        <div class="meta-box">
+          <span>Landasan Hubungan</span>
+          <strong style="color: #fbbf24;">KUHPerdata Pasal 1320</strong>
+        </div>
+        <div class="meta-box">
+          <span>Periode Rilis</span>
+          <strong>Tahun Anggaran 2026</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PAGE 2: EXECUTIVE SUMMARY & PROBLEM SOLVING ================= -->
+  <div class="page">
+    <!-- Section 1: Executive Summary -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">🎯</div>
+        <div class="section-title">
+          <h2>1. Ringkasan Eksekutif & Visi Transformasi Digital</h2>
+          <p>Latar Belakang, Visi Korporasi, dan Nilai Strategis Platform UBK</p>
+        </div>
+      </div>
+      <div style="font-size: 9pt; color: #334155; line-height: 1.6;">
+        <p style="margin-bottom: 8px;">
+          Platform <strong>Umar Bin Alkhattab for Umrah (UBK)</strong> hadir sebagai ekosistem digital terintegrasi yang menghubungkan jamaah umrah di seluruh penjuru Indonesia langsung dengan penyelenggara resmi di Tanah Suci Makkah dan Madinah.
+        </p>
+        <p style="margin-bottom: 8px;">
+          Menyatukan kepatuhan syariah dan regulasi Kemenag secara ketat, platform ini menghadirkan pengalaman pemesanan digital yang aman, sekaligus membangun jaringan pemasaran afiliasi mandiri terdesentralisasi yang memberdayakan ribuan masyarakat Indonesia untuk meraih penghasilan berkah tanpa modal dan tanpa ikatan jam kerja formal.
+        </p>
+        <div class="callout">
+          <strong>Tujuan Strategis Manajemen:</strong> Mengubah tata kelola pemasaran dan reservasi umrah dari metode manual konvensional yang rentan kebocoran menjadi ekosistem cloud modern yang 100% terotomasi, aman, dan akuntabel.
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Real Market Problems & UBK Solutions -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">⚡</div>
+        <div class="section-title">
+          <h2>2. Masalah Nyata di Industri Umrah & Solusi Teknologi UBK</h2>
+          <p>Tantangan Operasional di Indonesia dan Jawaban Solutif Sistem</p>
+        </div>
+      </div>
+      <div class="grid-2">
+        <!-- Problem 1 -->
+        <div class="card">
+          <div class="card-title" style="color: #b91c1c;">
+            <span>❌ 1. Risiko Penipuan & Setoran Pribadi</span>
+          </div>
+          <div class="card-desc">
+            Banyak oknum perantara atau calo mengumpulkan dana setoran jamaah ke rekening pribadi, memicu bahaya penggelapan dan merusak reputasi travel.
+          </div>
+          <div class="card-solution">
+            ✅ <strong>Solusi UBK:</strong> Larangan total uang tunai. Seluruh pembayaran wajib ditransfer langsung ke rekening giro resmi PT. UBK dengan verifikasi mutasi sistem otomatis.
+          </div>
+        </div>
+
+        <!-- Problem 2 -->
+        <div class="card">
+          <div class="card-title" style="color: #b91c1c;">
+            <span>❌ 2. Kebocoran Klien Mitra (Client Leakage)</span>
+          </div>
+          <div class="card-desc">
+            Ketika mitra mempromosikan travel, jamaah sering mencari kontak pusat secara mandiri sehingga mitra kehilangan komisi dan jerih payahnya.
+          </div>
+          <div class="card-solution">
+            ✅ <strong>Solusi UBK:</strong> Halaman mandiri terisolasi (<code>/m/[kode]</code>) untuk setiap mitra. Seluruh tombol booking dan WhatsApp mengunci rujukan ke mitra bersangkutan 100%.
+          </div>
+        </div>
+
+        <!-- Problem 3 -->
+        <div class="card">
+          <div class="card-title" style="color: #b91c1c;">
+            <span>❌ 3. Rekap Komisi Manual & Keterlambatan</span>
+          </div>
+          <div class="card-desc">
+            Pencatatan komisi di buku catatan atau Excel manual kerap memicu salah hitung, perselisihan bagi hasil, dan komplain keterlambatan pencairan.
+          </div>
+          <div class="card-solution">
+            ✅ <strong>Solusi UBK:</strong> Dompet digital cerdas (Smart Wallet) dengan pencatatan komisi otomatis per booking dan alur penarikan dana (Payout) cepat disertai bukti perbankan.
+          </div>
+        </div>
+
+        <!-- Problem 4 -->
+        <div class="card">
+          <div class="card-title" style="color: #b91c1c;">
+            <span>❌ 4. Pembajakan Desain & Perubahan Harga</span>
+          </div>
+          <div class="card-desc">
+            Brosur diedit oleh pihak tak bertanggung jawab dengan nomor palsu atau harga yang tidak sesuai standar, merugikan calon jamaah.
+          </div>
+          <div class="card-solution">
+            ✅ <strong>Solusi UBK:</strong> Proteksi Anti-Screenshot DRM, tanda air dinamis berlisensi, dan Marketplace Poster resmi yang dapat diunduh menggunakan poin keaktifan.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PAGE 3: PLATFORM ARCHITECTURE ================= -->
+  <div class="page">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">🏛️</div>
+        <div class="section-title">
+          <h2>3. Peta Arsitektur & Binaan Sistem Terpadu UBK</h2>
+          <p>Penjelasan 5 Modul Utama Platform Berbasis Next.js & Cloud Database</p>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; font-size: 9pt;">
+        <!-- Module 1 -->
+        <div class="card">
+          <div class="card-title" style="color: #065f46;">
+            1️⃣ Portal Publik Jamaah (Homepage - <code>/</code>)
+          </div>
+          <div class="card-desc">
+            • <strong>Showcase Paket Interaktif:</strong> Tampilan visual dinamis katalog paket (VIP, Platinum, Classic) dengan komparasi fasilitas hotel bintang 5 dan maskapai penerbangan.<br>
+            • <strong>Galeri Jamaah Marquee:</strong> Dokumentasi sinematik keberangkatan dan kepuasan jamaah terdahulu yang membangun kepercayaan publik.<br>
+            • <strong>Formulir Reservasi Digital:</strong> Pendaftaran instan calon jamaah yang meneruskan data manifest langsung ke pusat layanan.
+          </div>
+        </div>
+
+        <!-- Module 2 -->
+        <div class="card">
+          <div class="card-title" style="color: #065f46;">
+            2️⃣ Halaman Rekrutmen Mitra Mandiri (Landing Page - <code>/mitra</code>)
+          </div>
+          <div class="card-desc">
+            • <strong>Prinsip Kebebasan:</strong> Kampanye kerja mandiri tanpa jam kerja formal (Bebas Waktu & Tempat) dari seluruh Indonesia.<br>
+            • <strong>Kalkulator Simulasi Komisi (Live):</strong> Slider interaktif yang menghitung estimasi pendapatan langsung dan pasif secara transparan.<br>
+            • <strong>Klausul Perjanjian Hukum:</strong> Modal syarat pendaftaran berbasis KUHPerdata Pasal 1320 & 1338 yang melindungi travel dari tuntutan hubungan industrial tetap.
+          </div>
+        </div>
+
+        <!-- Module 3 -->
+        <div class="card">
+          <div class="card-title" style="color: #065f46;">
+            3️⃣ Halaman Khusus Mitra Terisolasi (Landing Page - <code>/m/[kode]</code>)
+          </div>
+          <div class="card-desc">
+            • Menampilkan identitas nama, foto profil, nomor WhatsApp, dan barcode QR unik milik mitra.<br>
+            • Mengunci calon jamaah agar tidak berpindah ke kontak travel pusat, menjamin hak komisi mitra terlindungi 100%.
+          </div>
+        </div>
+
+        <!-- Module 4 -->
+        <div class="card">
+          <div class="card-title" style="color: #065f46;">
+            4️⃣ Dasbor Pengelolaan Finansial Mitra (Dashboard - <code>/dashboard</code>)
+          </div>
+          <div class="card-desc">
+            • <strong>Dompet Finansial:</strong> Pemantauan saldo aktif, total komisi terkumpul, dan riwayat penarikan dana secara real-time.<br>
+            • <strong>Manajemen Downline Team:</strong> Struktur pohon tim binaan untuk memantau performa penjualan dan perolehan bonus supervisi.<br>
+            • <strong>Marketplace Brosur & Poin:</strong> Penukaran poin prestasi untuk mendapatkan materi promosi resolusi tinggi tanpa watermark.
+          </div>
+        </div>
+
+        <!-- Module 5 -->
+        <div class="card">
+          <div class="card-title" style="color: #065f46;">
+            5️⃣ Superpanel Kontrol Manajemen Pusat (Admin Portal - <code>/admin</code>)
+          </div>
+          <div class="card-desc">
+            • <strong>Pengaturan Paket Dinamis:</strong> Tambah, edit jadwal keberangkatan, harga paket, dan kuota hotel sekali klik.<br>
+            • <strong>Audit Keuangan & Validasi:</strong> Konfirmasi mutasi pembayaran DP jamaah dan persetujuan transfer komisi mitra.<br>
+            • <strong>Ekspor Manifest Jamaah (CSV):</strong> Pengunduhan data paspor dan identitas jamaah untuk kelengkapan visa dan Siskopatuh.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PAGE 4: COMMISSION & WORKFLOW ================= -->
+  <div class="page">
+    <!-- Section 4: Commission -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">💰</div>
+        <div class="section-title">
+          <h2>4. Skema Komisi & Pembagian Hasil Transparan</h2>
+          <p>Alokasi Finansial Kemitraan yang Adil, Berkelanjutan, dan Menguntungkan</p>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 16px;">
+        <div class="comm-card primary">
+          <span style="font-size: 24pt;">👤</span>
+          <div style="font-weight: 800; font-size: 11pt; color: #065f46;">Komisi Pemasar Langsung</div>
+          <div class="comm-val comm-primary">Rp 500.000,-</div>
+          <div style="font-size: 8.5pt; color: #047857;">
+            Diberikan langsung per jamaah yang melakukan pembayaran DP melalui tautan rujukan mitra.
+          </div>
+          <div style="margin-top: 8px; font-weight: 700; font-size: 8pt; background: #a7f3d0; color: #064e3b; padding: 4px 8px; border-radius: 9999px;">
+            Simulasi: 20 Jamaah = Rp 10.000.000,- Bersih
+          </div>
+        </div>
+
+        <div class="comm-card secondary">
+          <span style="font-size: 24pt;">👥</span>
+          <div style="font-weight: 800; font-size: 11pt; color: #92400e;">Bonus Supervisi Pembinaan Tim</div>
+          <div class="comm-val comm-secondary">Rp 150.000,-</div>
+          <div style="font-size: 8.5pt; color: #78350f;">
+            Diberikan kepada mitra sponsor atas setiap jamaah yang didaftarkan oleh sub-mitra binaannya.
+          </div>
+          <div style="margin-top: 8px; font-weight: 700; font-size: 8pt; background: #fde68a; color: #78350f; padding: 4px 8px; border-radius: 9999px;">
+            Pasif Income Berkelanjutan dari Jaringan
+          </div>
+        </div>
+      </div>
+
+      <!-- Step by step flow -->
+      <div style="font-size: 8.5pt; font-weight: 700; margin-bottom: 8px; color: #1e293b;">
+        🔄 Siklus 4 Tahap: Dari Promosi hingga Pencairan Dana:
+      </div>
+      <div class="grid-4" style="text-align: center;">
+        <div class="card" style="padding: 10px;">
+          <div style="font-weight: 800; color: #d97706; margin-bottom: 4px;">1. Sebarkan Link</div>
+          <div style="font-size: 8pt; color: #64748b;">Mitra membagikan link personal / QR code di medsos.</div>
+        </div>
+        <div class="card" style="padding: 10px;">
+          <div style="font-weight: 800; color: #d97706; margin-bottom: 4px;">2. Booking Digital</div>
+          <div style="font-size: 8pt; color: #64748b;">Jamaah memilih paket dan mengisi manifest booking.</div>
+        </div>
+        <div class="card" style="padding: 10px;">
+          <div style="font-weight: 800; color: #d97706; margin-bottom: 4px;">3. Setor ke PT. UBK</div>
+          <div style="font-size: 8pt; color: #64748b;">Pembayaran DP langsung ke rekening giro resmi kantor.</div>
+        </div>
+        <div class="card" style="padding: 10px;">
+          <div style="font-weight: 800; color: #d97706; margin-bottom: 4px;">4. Komisi Masuk</div>
+          <div style="font-size: 8pt; color: #64748b;">Komisi bertambah di saldo dompet dan siap dicairkan.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 5: Legal & Regulation -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">⚖️</div>
+        <div class="section-title">
+          <h2>5. Kepatuhan Regulasi & Landasan Hukum Republik Indonesia</h2>
+          <p>Perlindungan Hukum bagi Perusahaan dan Fleksibilitas Mitra Pemasar</p>
+        </div>
+      </div>
+
+      <div class="grid-3" style="font-size: 8.5pt;">
+        <div class="card">
+          <div class="card-title" style="color: #92400e;">📜 KUHPerdata Pasal 1320</div>
+          <div class="card-desc">
+            Hubungan kemitraan mandiri (partnership), bukan hubungan kerja karyawan tetap. Melindungi perusahaan dari kewajiban upah minimum, pesangon, dan perselisihan ketenagakerjaan.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="color: #065f46;">🔒 UU PDP No. 27/2022</div>
+          <div class="card-desc">
+            Kepatuhan penuh pada UU Perlindungan Data Pribadi. Seluruh dokumen identitas paspor dan manifes jamaah dienkripsi secara aman dan dilarang disebarluaskan tanpa izin.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="color: #1e3a8a;">🕋 Kepatuhan 5 Pasti Umrah</div>
+          <div class="card-desc">
+            Standar Kementerian Agama RI: Pasti Travel Berizin PPIU, Pasti Jadwal Penerbangannya, Pasti Akomodasi Hotelnya, Pasti Visanya, dan Pasti Paket Layanannya.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 6: Management Recommendation -->
+    <div class="section" style="background: linear-gradient(135deg, #022c22 0%, #0f172a 100%); color: #ffffff; border: 2px solid #fbbf24; text-align: center;">
+      <h2 style="font-size: 13pt; font-weight: 800; color: #fef08a; margin-bottom: 8px;">
+        Rekomendasi Manajemen & Kesiapan Peluncuran
+      </h2>
+      <p style="font-size: 8.5pt; color: #cbd5e1; max-width: 600px; margin: 0 auto 12px; line-height: 1.5;">
+        Platform UBK Umrah telah rampung 100% dari segi arsitektur kode, keamanan basis data, dan otomasi alur transaksi. Siap diluncurkan secara nasional untuk memperluas jangkauan pasar umrah Indonesia secara masif, aman, dan menguntungkan.
+      </p>
+      <div style="font-size: 8pt; color: #94a3b8; font-weight: 600;">
+        📞 Kontak Manajemen: +62 851-1053-9752 • 🌐 Web Resmi: ubk-umrah.vercel.app • 📍 Bogor, Indonesia
+      </div>
+    </div>
+
+    <div class="doc-footer">
+      Dokumen ini diterbitkan resmi oleh Tim Pengembang Teknologi PT. Umar Bin Alkhattab for Umrah (UBK) • Hak Cipta Dilindungi Undang-Undang 2026.
+    </div>
+  </div>
+
+</body>
+</html>
