@@ -219,20 +219,29 @@ export async function POST(req: Request) {
 
     let finalImageUrl = normalizeImageUrl(uploadedImageUrl) || "";
 
-    // If an image file was uploaded as base64, save to public/uploads/posters/
+    // If an image file was uploaded as base64, try to save to public/uploads/posters/, or fallback to base64 on serverless
     if (imageBase64 && imageBase64.startsWith("data:image")) {
       const matches = imageBase64.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
       if (matches && matches.length === 3) {
         const ext = matches[1].split("/")[1] || "jpg";
         const buffer = Buffer.from(matches[2], "base64");
         const filename = `poster-${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${ext}`;
-        const uploadDir = path.join(process.cwd(), "public", "uploads", "posters");
-        if (!fs.existsSync(uploadDir)) {
-          fs.mkdirSync(uploadDir, { recursive: true });
+        
+        try {
+          const uploadDir = path.join(process.cwd(), "public", "uploads", "posters");
+          if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+          }
+          const filePath = path.join(uploadDir, filename);
+          fs.writeFileSync(filePath, buffer);
+          finalImageUrl = `/uploads/posters/${filename}`;
+        } catch (fsErr) {
+          // In read-only serverless environment (e.g. Vercel), fallback to data URL directly
+          console.warn("Read-only filesystem detected, using data URI directly:", fsErr);
+          finalImageUrl = imageBase64;
         }
-        const filePath = path.join(uploadDir, filename);
-        fs.writeFileSync(filePath, buffer);
-        finalImageUrl = `/uploads/posters/${filename}`;
+      } else {
+        finalImageUrl = imageBase64;
       }
     }
 
@@ -276,7 +285,7 @@ export async function POST(req: Request) {
       data: {
         title,
         description: description || "Desain materi promosi resmi PT. Umar Bin Alkhattab for Umrah (UBK).",
-        price: Number(posterPrice),
+        price: Number(posterPrice) || 0,
         category: category || "INSTAGRAM_FEED",
         previewImageUrl,
         cleanImageUrl,
@@ -284,8 +293,11 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ success: true, template: newTemplate });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Publish template error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error?.message || "Internal server error saat menyimpan poster" },
+      { status: 500 }
+    );
   }
 }

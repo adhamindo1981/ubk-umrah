@@ -117,14 +117,46 @@ export function AdminPosterManagementModal() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      alert(isArabic ? "حجم الصورة كبير جداً، الحد الأقصى 10 ميجابايت" : "Ukuran foto terlalu besar, maksimal 10MB");
+    if (file.size > 15 * 1024 * 1024) {
+      alert(isArabic ? "حجم الصورة كبير جداً، الحد الأقصى 15 ميجابايت" : "Ukuran foto terlalu besar, maksimal 15MB");
       return;
     }
 
     const reader = new FileReader();
-    reader.onload = () => {
-      setSelectedFileBase64(reader.result as string);
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 1200;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.86);
+          setSelectedFileBase64(compressedDataUrl);
+        } else {
+          setSelectedFileBase64(result);
+        }
+      };
+      img.onerror = () => {
+        setSelectedFileBase64(result);
+      };
+      img.src = result;
     };
     reader.readAsDataURL(file);
   }
