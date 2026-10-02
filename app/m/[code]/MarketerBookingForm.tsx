@@ -2,6 +2,8 @@
 
 import { useState, useEffect, FormEvent } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
+import { AntiFraudInlineBox, AntiFraudConfirmationModal } from "@/components/AntiFraudPaymentNotice";
+import { OFFICIAL_BANK_CONFIG } from "@/lib/bankConfig";
 
 interface MarketerBookingFormProps {
   referralCode: string;
@@ -23,7 +25,10 @@ export function MarketerBookingForm({
   const [phone, setPhone] = useState("");
   const [packageChoice, setPackageChoice] = useState(initialPackage || "UMRAH TAYSIR PROGRAM 9 HARI 2026");
   const [dynamicPackages, setDynamicPackages] = useState<Array<{ id: number; title: string; titleAr?: string | null; priceQuad: number; programDays: number }>>([]);
+  const [hasAgreedBankPolicy, setHasAgreedBankPolicy] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [copiedBank, setCopiedBank] = useState(false);
   const [orderResult, setOrderResult] = useState<{
     success: boolean;
     orderId?: number;
@@ -55,8 +60,26 @@ export function MarketerBookingForm({
     fetchDynamicPackages();
   }, [initialPackage, isArabic]);
 
-  async function handleSubmit(e: FormEvent) {
+  // Intercept form submit: trigger the mandatory confirmation modal first
+  function handlePreSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!name.trim() || !email.trim() || !phone.trim()) {
+      return;
+    }
+    if (!hasAgreedBankPolicy) {
+      alert(
+        isArabic
+          ? "يُرجى الموافقة على إقرار وتنبيه التحويل إلى الحساب الرسمي للشركة للمتابعة."
+          : "Mohon centang persetujuan pembayaran hanya ke rekening resmi PT. UBK untuk melanjutkan."
+      );
+      return;
+    }
+    // Open mandatory modal that cannot be bypassed
+    setShowConfirmModal(true);
+  }
+
+  // Executed only after user explicitly confirms inside the modal
+  async function executeSubmitOrder() {
     setLoading(true);
     setOrderResult(null);
 
@@ -75,6 +98,7 @@ export function MarketerBookingForm({
 
       const data = await res.json();
       setLoading(false);
+      setShowConfirmModal(false);
 
       if (res.ok) {
         setOrderResult({ success: true, orderId: data.orderId });
@@ -86,12 +110,21 @@ export function MarketerBookingForm({
       }
     } catch (err) {
       setLoading(false);
+      setShowConfirmModal(false);
       setOrderResult({
         success: false,
         error: isArabic ? "تعذر الاتصال بالخادم" : "Terjadi kesalahan jaringan. Silakan coba kembali.",
       });
     }
   }
+
+  const handleCopyBank = () => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(OFFICIAL_BANK_CONFIG.accountNumber);
+      setCopiedBank(true);
+      setTimeout(() => setCopiedBank(false), 2500);
+    }
+  };
 
   if (orderResult?.success) {
     const rawTargetPhone = (marketerWhatsapp || "6281234567890").replace(/\D/g, "");
@@ -105,7 +138,7 @@ Saya telah mendaftar layanan ibadah Umrah melalui halaman resmi kemitraan Anda:
 • Pilihan Paket: ${packageChoice}
 • Kode Referral: ${referralCode}
 
-Mohon konfirmasi pendaftaran dan panduan tahapan selanjutnya. Terima kasih.
+*Catatan Keamanan:* Saya memahami bahwa pembayaran DP sebesar Rp 5.000.000,- hanya sah ditransfer langsung ke rekening giro resmi PT. UBK (${OFFICIAL_BANK_CONFIG.bankName}: ${OFFICIAL_BANK_CONFIG.accountNumber}). Mohon panduan langkah berikutnya. Terima kasih.
 
 ----------------------------------------
 
@@ -117,12 +150,12 @@ Mohon konfirmasi pendaftaran dan panduan tahapan selanjutnya. Terima kasih.
 • الباقة المختارة: ${packageChoice}
 • كود الإحالة: ${referralCode}
 
-أرجو تأكيد استلام الحجز وموافاتي بالخطوات ومواعيد السفر القادمة. شكراً لك وبارك الله فيك.`;
+ملاحظة أمنية: أؤكد أنني سأقوم بسداد الدفعة المقدمة حصراً إلى الحساب الرسمي لشركة PT. UBK (${OFFICIAL_BANK_CONFIG.bankName}: ${OFFICIAL_BANK_CONFIG.accountNumber}). أرجو تزويدي بالخطوات القادمة.`;
 
     const waHref = `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(waBookingMsg)}`;
 
     return (
-      <div className="text-center py-6 space-y-5">
+      <div className="text-center py-6 space-y-6">
         <div className="w-16 h-16 bg-gradient-to-tr from-emerald-500 to-amber-400 text-slate-950 rounded-full flex items-center justify-center mx-auto text-2xl font-black shadow-xl shadow-emerald-500/20">
           ✓
         </div>
@@ -132,6 +165,41 @@ Mohon konfirmasi pendaftaran dan panduan tahapan selanjutnya. Terima kasih.
           </h3>
           <p className="text-xs text-slate-300 max-w-sm mx-auto leading-relaxed">
             {t("bookingSuccessMsg", { orderId: orderResult.orderId || 0 })}
+          </p>
+        </div>
+
+        {/* Prominent Payment Reminder in Success Screen */}
+        <div className="p-4 rounded-2xl bg-slate-900 border-2 border-amber-500/60 text-start space-y-2.5 max-w-md mx-auto shadow-xl">
+          <div className="flex items-center justify-between text-xs font-bold text-amber-400">
+            <span>💳 {isArabic ? "الحساب البنكي الرسمي لسداد الدفعة المقدمة" : "Rekening Resmi Pembayaran DP Umrah"}</span>
+            <span className="text-[10px] bg-red-500/20 text-red-300 px-2 py-0.5 rounded-full font-bold">
+              {isArabic ? "حظر السداد النقدي" : "Dilarang Tunai"}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between gap-2 p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+            <div>
+              <div className="text-[10px] text-slate-400 font-semibold">{OFFICIAL_BANK_CONFIG.bankName}</div>
+              <div className="text-base font-black text-white font-mono tracking-wider">
+                {OFFICIAL_BANK_CONFIG.accountNumber}
+              </div>
+              <div className="text-[10px] text-emerald-400">a.n. {OFFICIAL_BANK_CONFIG.accountHolder}</div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleCopyBank}
+              className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-lg transition active:scale-95 flex items-center gap-1 shrink-0"
+            >
+              <span>{copiedBank ? "✓" : "📋"}</span>
+              <span>{copiedBank ? (isArabic ? "تم النسخ" : "Tersalin") : (isArabic ? "نسخ" : "Salin")}</span>
+            </button>
+          </div>
+
+          <p className="text-[10.5px] text-slate-400 leading-relaxed">
+            {isArabic
+              ? "يرجى الاحتفاظ بإشعار التحويل البنكي وإرساله للمسوق المعتمد أو لإدارة الشركة عبر الواتساب لتأكيد الحجز."
+              : "Simpan bukti transfer bank dan kirimkan ke konsultan/manajemen via WhatsApp untuk validasi pemesanan."}
           </p>
         </div>
 
@@ -159,6 +227,7 @@ Mohon konfirmasi pendaftaran dan panduan tahapan selanjutnya. Terima kasih.
               setName("");
               setEmail("");
               setPhone("");
+              setHasAgreedBankPolicy(false);
             }}
             className="text-xs font-bold text-amber-300 hover:text-amber-200 bg-slate-900 hover:bg-slate-800 border border-amber-500/30 px-5 py-2.5 rounded-xl transition"
           >
@@ -170,115 +239,154 @@ Mohon konfirmasi pendaftaran dan panduan tahapan selanjutnya. Terima kasih.
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 text-start">
-      {orderResult?.error && (
-        <div className="p-3.5 bg-rose-950/80 border border-rose-500/50 text-rose-200 text-xs font-semibold rounded-xl">
-          {orderResult.error}
-        </div>
-      )}
-
-      <div>
-        <label className="block text-xs font-bold text-amber-300/90 mb-1.5">
-          {t("fullName")}
-        </label>
-        <input
-          type="text"
-          required
-          placeholder={t("fullNamePlaceholder")}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-3.5 text-sm bg-slate-900/90 border border-slate-700 text-white placeholder:text-slate-500 rounded-xl outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400 transition"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-xs font-bold text-amber-300/90 mb-1.5">
-            {t("waNumber")}
-          </label>
-          <input
-            type="tel"
-            required
-            placeholder="081234567890"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full px-4 py-3.5 text-sm bg-slate-900/90 border border-slate-700 text-white placeholder:text-slate-500 rounded-xl outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400 font-mono transition"
-          />
-        </div>
+    <>
+      <form onSubmit={handlePreSubmit} className="space-y-5 text-start">
+        {orderResult?.error && (
+          <div className="p-3.5 bg-rose-950/80 border border-rose-500/50 text-rose-200 text-xs font-semibold rounded-xl">
+            {orderResult.error}
+          </div>
+        )}
 
         <div>
           <label className="block text-xs font-bold text-amber-300/90 mb-1.5">
-            {t("emailAddress")}
+            {t("fullName")}
           </label>
           <input
-            type="email"
+            type="text"
             required
-            placeholder="nama@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            placeholder={t("fullNamePlaceholder")}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             className="w-full px-4 py-3.5 text-sm bg-slate-900/90 border border-slate-700 text-white placeholder:text-slate-500 rounded-xl outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400 transition"
           />
         </div>
-      </div>
 
-      <div>
-        <label className="block text-xs font-bold text-amber-300/90 mb-1.5">
-          {t("selectPackage")}
-        </label>
-        <select
-          value={packageChoice}
-          onChange={(e) => setPackageChoice(e.target.value)}
-          className="w-full px-4 py-3.5 text-sm bg-slate-900/90 border border-slate-700 text-amber-200 rounded-xl outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400 transition"
-        >
-          {dynamicPackages.length > 0 ? (
-            dynamicPackages.map((p) => {
-              const label = isArabic && p.titleAr ? p.titleAr : p.title;
-              return (
-                <option key={p.id} value={label} className="bg-slate-900 text-white">
-                  {label} ({p.programDays} {isArabic ? "أيام" : "Hari"} • Rp {Math.round(p.priceQuad / 1000000)} JT)
-                </option>
-              );
-            })
-          ) : (
-            <>
-              <option value="Paket Reguler 9 Hari" className="bg-slate-900 text-white">{t("pkg1Title")} ({t("pkg1Price")})</option>
-              <option value="Paket VIP 12 Hari" className="bg-slate-900 text-white">{t("pkg2Title")} ({t("pkg2Price")})</option>
-              <option value="Paket Plus Turki / Dubai" className="bg-slate-900 text-white">{t("pkg3Title")} ({t("pkg3Price")})</option>
-            </>
-          )}
-        </select>
-      </div>
-
-      {/* Locked Marketer Referral Attribution Badge */}
-      <div>
-        <label className="block text-xs font-bold text-slate-400 mb-1.5">
-          {t("refCodeLocked")}
-        </label>
-        <div className="flex items-center justify-between bg-amber-500/10 border border-amber-500/30 px-4 py-3 rounded-xl text-xs font-mono font-bold text-amber-300 shadow-inner">
-          <div className="flex items-center gap-2">
-            <span>🔒</span>
-            <span className="tracking-wider">{referralCode}</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-bold text-amber-300/90 mb-1.5">
+              {t("waNumber")}
+            </label>
+            <input
+              type="tel"
+              required
+              placeholder="081234567890"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full px-4 py-3.5 text-sm bg-slate-900/90 border border-slate-700 text-white placeholder:text-slate-500 rounded-xl outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400 font-mono transition"
+            />
           </div>
-          <span className="text-[11px] font-sans font-normal text-slate-400">
-            {t("officialPartner")}: <strong className="text-amber-300 font-bold">{marketerName}</strong>
-          </span>
+
+          <div>
+            <label className="block text-xs font-bold text-amber-300/90 mb-1.5">
+              {t("emailAddress")}
+            </label>
+            <input
+              type="email"
+              required
+              placeholder="nama@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3.5 text-sm bg-slate-900/90 border border-slate-700 text-white placeholder:text-slate-500 rounded-xl outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400 transition"
+            />
+          </div>
         </div>
-      </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full py-4 text-sm font-black text-slate-950 bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500 hover:from-emerald-500 hover:to-amber-400 rounded-2xl shadow-xl shadow-emerald-950/60 transition-all duration-300 transform active:scale-95 disabled:opacity-50 relative overflow-hidden before:absolute before:inset-0 before:bg-white/30 before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700"
-      >
-        <span className="relative z-10 flex items-center justify-center gap-2">
-          <span>{loading ? t("submitting") : t("submitBooking")}</span>
-          <span>🕋</span>
-        </span>
-      </button>
+        <div>
+          <label className="block text-xs font-bold text-amber-300/90 mb-1.5">
+            {t("selectPackage")}
+          </label>
+          <select
+            value={packageChoice}
+            onChange={(e) => setPackageChoice(e.target.value)}
+            className="w-full px-4 py-3.5 text-sm bg-slate-900/90 border border-slate-700 text-amber-200 rounded-xl outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400 transition"
+          >
+            {dynamicPackages.length > 0 ? (
+              dynamicPackages.map((p) => {
+                const label = isArabic && p.titleAr ? p.titleAr : p.title;
+                return (
+                  <option key={p.id} value={label} className="bg-slate-900 text-white">
+                    {label} ({p.programDays} {isArabic ? "أيام" : "Hari"} • Rp {Math.round(p.priceQuad / 1000000)} JT)
+                  </option>
+                );
+              })
+            ) : (
+              <>
+                <option value="Paket Reguler 9 Hari" className="bg-slate-900 text-white">{t("pkg1Title")} ({t("pkg1Price")})</option>
+                <option value="Paket VIP 12 Hari" className="bg-slate-900 text-white">{t("pkg2Title")} ({t("pkg2Price")})</option>
+                <option value="Paket Plus Turki / Dubai" className="bg-slate-900 text-white">{t("pkg3Title")} ({t("pkg3Price")})</option>
+              </>
+            )}
+          </select>
+        </div>
 
-      <p className="text-[11px] text-center text-slate-400">
-        {t("dataProtected")}
-      </p>
-    </form>
+        {/* Locked Marketer Referral Attribution Badge */}
+        <div>
+          <label className="block text-xs font-bold text-slate-400 mb-1.5">
+            {t("refCodeLocked")}
+          </label>
+          <div className="flex items-center justify-between bg-amber-500/10 border border-amber-500/30 px-4 py-3 rounded-xl text-xs font-mono font-bold text-amber-300 shadow-inner">
+            <div className="flex items-center gap-2">
+              <span>🔒</span>
+              <span className="tracking-wider">{referralCode}</span>
+            </div>
+            <span className="text-[11px] font-sans font-normal text-slate-400">
+              {t("officialPartner")}: <strong className="text-amber-300 font-bold">{marketerName}</strong>
+            </span>
+          </div>
+        </div>
+
+        {/* PROMINENT ANTI-FRAUD INLINE CARD WITH OFFICIAL BANK DETAILS */}
+        <AntiFraudInlineBox isArabic={isArabic} />
+
+        {/* MANDATORY CHECKBOX DECLARATION */}
+        <label className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-900/90 border border-slate-700 hover:border-amber-500/50 cursor-pointer transition select-none">
+          <input
+            type="checkbox"
+            required
+            checked={hasAgreedBankPolicy}
+            onChange={(e) => setHasAgreedBankPolicy(e.target.checked)}
+            className="mt-1 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-600 bg-slate-800 shrink-0 cursor-pointer"
+          />
+          <span className="text-[11px] sm:text-xs text-slate-300 leading-relaxed">
+            {isArabic ? (
+              <>
+                <strong className="text-amber-400 font-bold">إقرار أمني إلزامي: </strong>
+                أقر بأنني اطلعت على التنبيه، وأتعهد بأن أي سداد للدفعة المقدمة أو الرسوم سيكون حصراً عبر التحويل المباشر لحساب شركة <strong className="text-white">PT. UMAR BIN AL-KHATTAB FOR UMRAH</strong> الرسمي، ولن أقوم بتسليم أي مبالغ للمسوق نقداً أو لحساب شخصي، والشركة غير مسؤولة عن خلاف ذلك.
+              </>
+            ) : (
+              <>
+                <strong className="text-amber-400 font-bold">Pernyataan Wajib: </strong>
+                Saya menyatakan telah membaca peringatan dan berkomitmen bahwa seluruh pembayaran uang muka (DP) hanya akan ditransfer ke rekening giro resmi <strong className="text-white">PT. UMAR BIN AL-KHATTAB FOR UMRAH</strong>, serta tidak akan menyerahkan uang tunai/transfer ke rekening pribadi mitra pemasar.
+              </>
+            )}
+          </span>
+        </label>
+
+        {/* SUBMIT BUTTON (INTERCEPTED TO SHOW MODAL) */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-4 text-sm font-black text-slate-950 bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500 hover:from-emerald-500 hover:to-amber-400 rounded-2xl shadow-xl shadow-emerald-950/60 transition-all duration-300 transform active:scale-95 disabled:opacity-50 relative overflow-hidden cursor-pointer"
+        >
+          <span className="relative z-10 flex items-center justify-center gap-2">
+            <span>{loading ? t("submitting") : t("submitBooking")}</span>
+            <span>🕋</span>
+          </span>
+        </button>
+
+        <p className="text-[11px] text-center text-slate-400">
+          {t("dataProtected")}
+        </p>
+      </form>
+
+      {/* MANDATORY PRE-CONFIRMATION MODAL */}
+      <AntiFraudConfirmationModal
+        isOpen={showConfirmModal}
+        isArabic={isArabic}
+        onConfirm={executeSubmitOrder}
+        onCancel={() => setShowConfirmModal(false)}
+        loading={loading}
+      />
+    </>
   );
 }

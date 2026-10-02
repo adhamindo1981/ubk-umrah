@@ -76,10 +76,25 @@ export async function POST(request: Request) {
             <p>Nomor Registrasi Anda: <strong>#${order.id}</strong></p>
             ${selectedPackage ? `<p>Pilihan Paket: <strong>${selectedPackage}</strong></p>` : ""}
             ${marketer ? `<p>Konsultan Pendamping: <strong>${marketer.username}</strong></p>` : ""}
+            
+            <div style="background-color: #fef2f2; border: 2px solid #ef4444; border-radius: 12px; padding: 16px; margin: 20px 0;">
+              <h3 style="color: #b91c1c; margin-top: 0;">⚠️ PERINGATAN KEAMANAN PEMBAYARAN RESMI</h3>
+              <p style="font-size: 13px; color: #450a0a;">
+                Dilarang keras menyerahkan uang tunai kepada konsultan/mitra pemasar atau mentransfer ke rekening pribadi siapa pun.
+                <strong>PT. Umar Bin Alkhattab for Umrah (UBK) TIDAK BERTANGGUNG JAWAB</strong> atas pembayaran di luar rekening resmi perusahaan.
+              </p>
+              <div style="background-color: #ffffff; border: 1px solid #fca5a5; border-radius: 8px; padding: 12px; margin-top: 10px;">
+                <p style="margin: 2px 0; font-size: 12px; color: #666;">Rekening Giro Resmi:</p>
+                <p style="margin: 4px 0; font-size: 16px; font-weight: bold; color: #047857;">Bank Syariah Indonesia (BSI)</p>
+                <p style="margin: 4px 0; font-size: 18px; font-family: monospace; font-weight: bold; color: #111;">7200-8899-1001</p>
+                <p style="margin: 2px 0; font-size: 13px; font-weight: bold; color: #333;">a.n. PT. UMAR BIN AL-KHATTAB FOR UMRAH</p>
+              </div>
+            </div>
+
             <p>Tim konsultan kami akan segera menghubungi Anda melalui WhatsApp untuk konsultasi dan detail jadwal.</p>
             <br />
             <p>Wassalamu'alaikum Warahmatullahi Wabarakatuh,</p>
-            <p><em>Manajemen UBK for Umrah</em></p>
+            <p><em>Manajemen PT. UBK for Umrah</em></p>
           </div>
         `,
       });
