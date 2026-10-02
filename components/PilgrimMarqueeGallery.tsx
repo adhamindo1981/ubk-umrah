@@ -211,13 +211,14 @@ export function PilgrimMarqueeGallery() {
 
               <button
                 onClick={() => setActiveZoomPhoto(null)}
-                className="absolute top-4 end-4 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center font-bold text-base transition border border-white/20 backdrop-blur-md"
+                className="absolute top-4 end-4 px-3 py-1.5 rounded-xl bg-black/70 hover:bg-black/95 text-white flex items-center gap-1.5 font-bold text-xs transition border border-white/20 backdrop-blur-md shadow-lg"
               >
-                ✕
+                <span>{isArabic ? "العودة / إغلاق" : "Kembali / Tutup"}</span>
+                <span>✕</span>
               </button>
             </div>
 
-            <div className="p-6 sm:p-7 space-y-2 bg-slate-900 text-start">
+            <div className="p-6 sm:p-7 space-y-3 bg-slate-900 text-start">
               <div className="flex items-center justify-between">
                 <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/40">
                   {isArabic && activeZoomPhoto.categoryAr ? activeZoomPhoto.categoryAr : activeZoomPhoto.category} • {activeZoomPhoto.year}
@@ -236,6 +237,17 @@ export function PilgrimMarqueeGallery() {
                   ? "توثيق رسمي معتمد لرحلات وأفواج عمر بن الخطاب للعمرة (UBK)"
                   : "Dokumentasi Resmi Keberangkatan Jamaah Umar Bin Alkhattab for Umrah (UBK)"}
               </p>
+
+              <div className="pt-2 flex justify-end border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setActiveZoomPhoto(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition inline-flex items-center gap-1.5 shadow-xs"
+                >
+                  <span>←</span>
+                  <span>{isArabic ? "العودة للمعرض" : "Kembali ke Galeri"}</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

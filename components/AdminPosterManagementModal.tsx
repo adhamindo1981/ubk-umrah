@@ -196,10 +196,12 @@ export function AdminPosterManagementModal() {
               </div>
 
               <button
+                type="button"
                 onClick={() => setIsOpen(false)}
-                className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-lg font-bold transition"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition border border-slate-700"
               >
-                ✕
+                <span>{isArabic ? "العودة / إغلاق" : "Kembali / Tutup"}</span>
+                <span>✕</span>
               </button>
             </div>
 
@@ -461,6 +463,18 @@ export function AdminPosterManagementModal() {
                 </form>
               )}
             </div>
+
+            {/* Modal Bottom Footer with Back Button */}
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition inline-flex items-center gap-1.5 shadow-2xs"
+              >
+                <span>←</span>
+                <span>{isArabic ? "العودة للوحة الإدارة" : "Kembali ke Panel"}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -474,18 +488,32 @@ export function AdminPosterManagementModal() {
           <div
             className="max-w-xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl p-4 space-y-3"
             onClick={(e) => e.stopPropagation()}
+            dir={isArabic ? "rtl" : "ltr"}
           >
             <div className="flex items-center justify-between pb-2 border-b">
               <span className="text-xs font-bold text-slate-900">
                 {isArabic ? "صورة إيصال التحويل البنكي للمسوق" : "Bukti Struk Transfer Bank"}
               </span>
-              <button onClick={() => setViewReceiptUrl(null)} className="text-slate-500 font-bold px-2">
-                ✕
+              <button
+                onClick={() => setViewReceiptUrl(null)}
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition"
+              >
+                <span>{isArabic ? "العودة / إغلاق" : "Kembali / Tutup"}</span>
+                <span>✕</span>
               </button>
             </div>
             <div className="bg-slate-100 p-2 rounded-xl flex items-center justify-center max-h-[70vh] overflow-auto">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={viewReceiptUrl} alt="Receipt" className="max-h-[65vh] object-contain rounded-lg" />
+            </div>
+            <div className="pt-2 flex justify-end border-t border-slate-100">
+              <button
+                onClick={() => setViewReceiptUrl(null)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition inline-flex items-center gap-1.5"
+              >
+                <span>←</span>
+                <span>{isArabic ? "العودة" : "Kembali"}</span>
+              </button>
             </div>
           </div>
         </div>

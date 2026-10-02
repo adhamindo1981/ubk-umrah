@@ -317,18 +317,19 @@ export function AdminPackagesManagementModal() {
                     setEditingPkg(null);
                     setIsOpen(false);
                   }}
-                  className="text-slate-400 hover:text-white font-bold px-2 py-1"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-bold transition border border-slate-700"
                 >
-                  ✕
+                  <span>{isArabic ? "العودة / إغلاق" : "Kembali / Tutup"}</span>
+                  <span>✕</span>
                 </button>
               </div>
             </div>
 
             {/* Modal Body */}
-            <div className="flex-1 overflow-y-auto p-5 sm:p-6 bg-slate-50 space-y-6">
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 bg-slate-50 space-y-6 text-slate-900">
               {/* Form View (Create / Edit) */}
               {(isCreating || editingPkg) ? (
-                <form onSubmit={handleSave} className="space-y-6 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                <form onSubmit={handleSave} className="space-y-6 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm text-slate-900">
                   <div className="flex items-center justify-between border-b pb-3">
                     <h4 className="font-black text-slate-900 text-base flex items-center gap-2">
                       <span>{editingPkg ? "✏️" : "➕"}</span>
@@ -344,16 +345,16 @@ export function AdminPackagesManagementModal() {
                         setIsCreating(false);
                         setEditingPkg(null);
                       }}
-                      className="text-xs text-slate-500 hover:text-slate-800 font-bold bg-slate-100 px-3 py-1.5 rounded-lg"
+                      className="text-xs text-slate-700 hover:text-slate-900 font-bold bg-slate-200 hover:bg-slate-300 border border-slate-300 px-3.5 py-2 rounded-xl transition inline-flex items-center gap-1.5 shadow-2xs"
                     >
-                      {isArabic ? "← إلغاء والعودة للقائمة" : "← Batal & Kembali"}
+                      <span>{isArabic ? "← إلغاء والعودة للقائمة" : "← Batal & Kembali"}</span>
                     </button>
                   </div>
 
                   {/* 1. Basic Info & Dates */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="sm:col-span-2">
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                      <label className="block text-xs font-bold text-slate-800 mb-1">
                         {isArabic ? "اسم / عنوان الباقة (بالإندونيسية أو الإنجليزية) *" : "Nama / Judul Paket Program *"}
                       </label>
                       <input
@@ -362,12 +363,12 @@ export function AdminPackagesManagementModal() {
                         placeholder="Contoh: UMRAH TAYSIR PROGRAM 9 HARI"
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold"
+                        className="w-full px-3.5 py-2.5 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold placeholder-slate-400"
                       />
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                      <label className="block text-xs font-bold text-slate-800 mb-1">
                         {isArabic ? "اسم الباقة (باللغة العربية)" : "Judul Paket (Bahasa Arab)"}
                       </label>
                       <input
@@ -375,12 +376,12 @@ export function AdminPackagesManagementModal() {
                         placeholder="مثال: برنامج عمرة التيسير 9 أيام"
                         value={formData.titleAr}
                         onChange={(e) => setFormData({ ...formData, titleAr: e.target.value })}
-                        className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold"
+                        className="w-full px-3.5 py-2.5 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold placeholder-slate-400"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                      <label className="block text-xs font-bold text-slate-800 mb-1">
                         {isArabic ? "السنة (Year) *" : "Tahun *"}
                       </label>
                       <input
@@ -388,12 +389,12 @@ export function AdminPackagesManagementModal() {
                         required
                         value={formData.year}
                         onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
-                        className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-mono"
+                        className="w-full px-3 py-2 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-mono font-bold"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                      <label className="block text-xs font-bold text-slate-800 mb-1">
                         {isArabic ? "الشهر (Periode Bulan) *" : "Periode Bulan *"}
                       </label>
                       <input
@@ -402,12 +403,12 @@ export function AdminPackagesManagementModal() {
                         placeholder="Desember / Syawal"
                         value={formData.month}
                         onChange={(e) => setFormData({ ...formData, month: e.target.value })}
-                        className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                        className="w-full px-3 py-2 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold placeholder-slate-400"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                      <label className="block text-xs font-bold text-slate-800 mb-1">
                         {isArabic ? "عدد أيام البرنامج *" : "Durasi Hari Program *"}
                       </label>
                       <input
@@ -415,12 +416,12 @@ export function AdminPackagesManagementModal() {
                         required
                         value={formData.programDays}
                         onChange={(e) => setFormData({ ...formData, programDays: Number(e.target.value) })}
-                        className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-mono"
+                        className="w-full px-3 py-2 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-mono font-bold"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                      <label className="block text-xs font-bold text-slate-800 mb-1">
                         {isArabic ? "قيمة الدفعة المقدمة (DP IDR) *" : "Uang Muka / DP (IDR) *"}
                       </label>
                       <input
@@ -429,7 +430,7 @@ export function AdminPackagesManagementModal() {
                         required
                         value={formData.downPayment}
                         onChange={(e) => setFormData({ ...formData, downPayment: Number(e.target.value) })}
-                        className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-mono font-bold text-emerald-800"
+                        className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-mono font-black text-emerald-950"
                       />
                     </div>
                   </div>
@@ -437,7 +438,7 @@ export function AdminPackagesManagementModal() {
                   {/* 2. Airline & Hotels */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                      <label className="block text-xs font-bold text-slate-800 mb-1">
                         {isArabic ? "الخطوط الجوية الناقلة *" : "Maskapai Penerbangan (Flight by) *"}
                       </label>
                       <input
@@ -446,12 +447,12 @@ export function AdminPackagesManagementModal() {
                         placeholder="Qatar Airways / Saudia / Garuda"
                         value={formData.airline}
                         onChange={(e) => setFormData({ ...formData, airline: e.target.value })}
-                        className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                        className="w-full px-3 py-2 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold placeholder-slate-400"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                      <label className="block text-xs font-bold text-slate-800 mb-1">
                         {isArabic ? "مكان الإقامة بمكة المكرمة *" : "Akomodasi Hotel Makkah *"}
                       </label>
                       <input
@@ -460,12 +461,12 @@ export function AdminPackagesManagementModal() {
                         placeholder="Jada Ajyad / Kayan Raya ⭐⭐⭐ (4 Malam)"
                         value={formData.makkahHotel}
                         onChange={(e) => setFormData({ ...formData, makkahHotel: e.target.value })}
-                        className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                        className="w-full px-3 py-2 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold placeholder-slate-400"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                      <label className="block text-xs font-bold text-slate-800 mb-1">
                         {isArabic ? "مكان الإقامة بالمدينة المنورة *" : "Akomodasi Hotel Madinah *"}
                       </label>
                       <input
@@ -474,7 +475,7 @@ export function AdminPackagesManagementModal() {
                         placeholder="Andalus Salam / Nada Salam ⭐⭐⭐ (3 Malam)"
                         value={formData.madinahHotel}
                         onChange={(e) => setFormData({ ...formData, madinahHotel: e.target.value })}
-                        className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                        className="w-full px-3 py-2 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold placeholder-slate-400"
                       />
                     </div>
                   </div>
@@ -488,7 +489,7 @@ export function AdminPackagesManagementModal() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="bg-white p-3 rounded-xl border border-amber-200">
-                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                        <label className="block text-[11px] font-bold text-slate-800 mb-1">
                           {isArabic ? "الغرفة الرباعية / الجماعية (QUAD) *" : "QUAD (Kamar Ber-4) *"}
                         </label>
                         <input
@@ -497,12 +498,12 @@ export function AdminPackagesManagementModal() {
                           required
                           value={formData.priceQuad}
                           onChange={(e) => setFormData({ ...formData, priceQuad: Number(e.target.value) })}
-                          className="w-full px-3 py-2 text-sm font-mono font-black text-emerald-700 border border-slate-300 rounded-lg outline-none"
+                          className="w-full px-3 py-2 text-sm font-mono font-black text-emerald-950 bg-white border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
 
                       <div className="bg-white p-3 rounded-xl border border-amber-200">
-                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                        <label className="block text-[11px] font-bold text-slate-800 mb-1">
                           {isArabic ? "الغرفة الثلاثية (TRIPLE) *" : "TRIPLE (Kamar Ber-3) *"}
                         </label>
                         <input
@@ -511,12 +512,12 @@ export function AdminPackagesManagementModal() {
                           required
                           value={formData.priceTriple}
                           onChange={(e) => setFormData({ ...formData, priceTriple: Number(e.target.value) })}
-                          className="w-full px-3 py-2 text-sm font-mono font-black text-emerald-700 border border-slate-300 rounded-lg outline-none"
+                          className="w-full px-3 py-2 text-sm font-mono font-black text-emerald-950 bg-white border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
 
                       <div className="bg-white p-3 rounded-xl border border-amber-200">
-                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                        <label className="block text-[11px] font-bold text-slate-800 mb-1">
                           {isArabic ? "الغرفة الثنائية (DOUBLE) *" : "DOUBLE (Kamar Ber-2) *"}
                         </label>
                         <input
@@ -525,7 +526,7 @@ export function AdminPackagesManagementModal() {
                           required
                           value={formData.priceDouble}
                           onChange={(e) => setFormData({ ...formData, priceDouble: Number(e.target.value) })}
-                          className="w-full px-3 py-2 text-sm font-mono font-black text-emerald-700 border border-slate-300 rounded-lg outline-none"
+                          className="w-full px-3 py-2 text-sm font-mono font-black text-emerald-950 bg-white border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
                     </div>
@@ -544,7 +545,7 @@ export function AdminPackagesManagementModal() {
                         placeholder="Contoh: Welcome Drink Zam-Zam / Paket ALBAIK / Ziarah Makkah"
                         value={newFreebieInput}
                         onChange={(e) => setNewFreebieInput(e.target.value)}
-                        className="flex-1 px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl"
+                        className="flex-1 px-3 py-2 text-xs bg-white text-slate-900 font-medium placeholder-slate-400 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500"
                       />
                       <button
                         type="button"
@@ -589,7 +590,7 @@ export function AdminPackagesManagementModal() {
                         placeholder="Contoh: Tiket Pesawat PP / Visa Umrah / Muthowwif / Koper"
                         value={newInclusionInput}
                         onChange={(e) => setNewInclusionInput(e.target.value)}
-                        className="flex-1 px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl"
+                        className="flex-1 px-3 py-2 text-xs bg-white text-slate-900 font-medium placeholder-slate-400 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500"
                       />
                       <button
                         type="button"
@@ -623,7 +624,7 @@ export function AdminPackagesManagementModal() {
 
                   {/* 6. Scholar Leader (المشايخ والمرافقين) */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label className="block text-xs font-bold text-slate-800 mb-1">
                       {isArabic
                         ? "البرنامج إذا كان برفقة شيخ أو أستاذ (Bersama Sheikh / Ustadz Pembimbing)"
                         : "Pembimbing / Tokoh Agama (Bersama Sheikh / Ustadz)"}
@@ -633,13 +634,13 @@ export function AdminPackagesManagementModal() {
                       placeholder="Contoh: Sheikh Dr. Hassan Bugis & Istri Ummi Nurlaila"
                       value={formData.scholarLeader}
                       onChange={(e) => setFormData({ ...formData, scholarLeader: e.target.value })}
-                      className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-semibold"
+                      className="w-full px-3.5 py-2.5 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold placeholder-slate-400"
                     />
                   </div>
 
                   {/* 7. Notes & Exchange Rate */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label className="block text-xs font-bold text-slate-800 mb-1">
                       {isArabic ? "ملاحظات وشروط الصرف (Catatan & Ketentuan Kurs)" : "Catatan / Note (Kebijakan & Kurs)"}
                     </label>
                     <textarea
@@ -647,7 +648,7 @@ export function AdminPackagesManagementModal() {
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       placeholder="Contoh: Note: Harga/jadwal sewaktu-waktu dapat berubah mengikuti kebijakan pemerintah atau maskapai. Kurs maksimal 18000 USD."
-                      className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-3.5 py-2 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-medium placeholder-slate-400"
                     />
                   </div>
 
@@ -668,14 +669,14 @@ export function AdminPackagesManagementModal() {
                         placeholder="Nama Label (contoh: No. Izin PPIU)"
                         value={newFieldLabel}
                         onChange={(e) => setNewFieldLabel(e.target.value)}
-                        className="w-1/3 px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl"
+                        className="w-1/3 px-3 py-2 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl font-medium placeholder-slate-400 focus:ring-2 focus:ring-emerald-500"
                       />
                       <input
                         type="text"
                         placeholder="Nilai / Isi (contoh: U-271 Tahun 2021)"
                         value={newFieldValue}
                         onChange={(e) => setNewFieldValue(e.target.value)}
-                        className="flex-1 px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl"
+                        className="flex-1 px-3 py-2 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl font-medium placeholder-slate-400 focus:ring-2 focus:ring-emerald-500"
                       />
                       <button
                         type="button"
@@ -715,7 +716,7 @@ export function AdminPackagesManagementModal() {
                   {/* 9. Badges & Visibility Toggles */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-center pt-2">
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                      <label className="block text-xs font-bold text-slate-800 mb-1">
                         {isArabic ? "شارة تسويقية (Badge ID)" : "Badge Tag (ID)"}
                       </label>
                       <input
@@ -723,12 +724,12 @@ export function AdminPackagesManagementModal() {
                         placeholder="Contoh: Paling Diminati / VIP"
                         value={formData.badge}
                         onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
-                        className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl"
+                        className="w-full px-3 py-2 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl font-bold placeholder-slate-400 focus:ring-2 focus:ring-emerald-500"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                      <label className="block text-xs font-bold text-slate-800 mb-1">
                         {isArabic ? "شارة تسويقية (بالعربية)" : "Badge Tag (Arab)"}
                       </label>
                       <input
@@ -736,7 +737,7 @@ export function AdminPackagesManagementModal() {
                         placeholder="الأكثر طلباً / فاخرة"
                         value={formData.badgeAr}
                         onChange={(e) => setFormData({ ...formData, badgeAr: e.target.value })}
-                        className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl"
+                        className="w-full px-3 py-2 text-xs bg-white text-slate-900 border border-slate-300 rounded-xl font-bold placeholder-slate-400 focus:ring-2 focus:ring-emerald-500"
                       />
                     </div>
 
@@ -887,9 +888,10 @@ export function AdminPackagesManagementModal() {
                         setIsCreating(false);
                         setEditingPkg(null);
                       }}
-                      className="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition"
+                      className="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition inline-flex items-center gap-1.5"
                     >
-                      {isArabic ? "إلغاء" : "Batal"}
+                      <span>←</span>
+                      <span>{isArabic ? "إلغاء والعودة" : "Batal & Kembali"}</span>
                     </button>
                   </div>
                 </form>
@@ -1045,6 +1047,22 @@ export function AdminPackagesManagementModal() {
                   )}
                 </div>
               )}
+            </div>
+
+            {/* Modal Bottom Footer with Back Button */}
+            <div className="p-4 bg-white border-t border-slate-200 flex justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsCreating(false);
+                  setEditingPkg(null);
+                }}
+                className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition inline-flex items-center gap-1.5 shadow-2xs"
+              >
+                <span>←</span>
+                <span>{isArabic ? "العودة للوحة الإدارة" : "Kembali ke Panel"}</span>
+              </button>
             </div>
           </div>
         </div>

@@ -195,10 +195,12 @@ export function AdminGalleryManagementModal() {
               </div>
 
               <button
+                type="button"
                 onClick={() => setIsOpen(false)}
-                className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center font-bold text-base transition"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition border border-slate-700"
               >
-                ✕
+                <span>{isArabic ? "العودة / إغلاق" : "Kembali / Tutup"}</span>
+                <span>✕</span>
               </button>
             </div>
 
@@ -425,6 +427,18 @@ export function AdminGalleryManagementModal() {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Modal Bottom Footer with Back Button */}
+            <div className="p-4 bg-slate-950/90 border-t border-slate-800 flex justify-end relative z-10">
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl transition inline-flex items-center gap-1.5 border border-slate-700 shadow-2xs"
+              >
+                <span>←</span>
+                <span>{isArabic ? "العودة للوحة الإدارة" : "Kembali ke Panel"}</span>
+              </button>
             </div>
           </div>
         </div>

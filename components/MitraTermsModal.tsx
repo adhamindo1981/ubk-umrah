@@ -58,9 +58,10 @@ export function MitraTermsModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-sm transition"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition border border-slate-700 shrink-0"
           >
-            ✕
+            <span>{isArabic ? "العودة / إغلاق" : "Kembali / Tutup"}</span>
+            <span>✕</span>
           </button>
         </div>
 
@@ -246,9 +247,10 @@ export function MitraTermsModal({
             <button
               type="button"
               onClick={onClose}
-              className="py-3 px-5 rounded-2xl font-bold text-xs bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition"
+              className="py-3 px-5 rounded-2xl font-bold text-xs bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700 transition inline-flex items-center justify-center gap-1.5"
             >
-              {isArabic ? "إغلاق" : "Tutup"}
+              <span>←</span>
+              <span>{isArabic ? "إلغاء والعودة" : "Batal & Kembali"}</span>
             </button>
           </div>
         </div>

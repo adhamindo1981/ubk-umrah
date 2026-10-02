@@ -578,9 +578,10 @@ export function UmrahPackagesSection({ onSelectPackage }: UmrahPackagesSectionPr
               </div>
               <button
                 onClick={() => setActiveDetailsPkg(null)}
-                className="text-slate-400 hover:text-slate-700 font-bold px-2 py-1"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition border border-slate-200"
               >
-                ✕
+                <span>{isArabic ? "العودة / إغلاق" : "Kembali / Tutup"}</span>
+                <span>✕</span>
               </button>
             </div>
 
@@ -651,9 +652,10 @@ export function UmrahPackagesSection({ onSelectPackage }: UmrahPackagesSectionPr
               </button>
               <button
                 onClick={() => setActiveDetailsPkg(null)}
-                className="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl"
+                className="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition inline-flex items-center justify-center gap-1.5"
               >
-                {isArabic ? "إغلاق" : "Tutup"}
+                <span>←</span>
+                <span>{isArabic ? "العودة للقائمة" : "Kembali ke Daftar"}</span>
               </button>
             </div>
           </div>

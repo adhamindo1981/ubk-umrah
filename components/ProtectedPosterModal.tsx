@@ -209,10 +209,11 @@ export function ProtectedPosterModal({ pkg, poster, onClose, onBookNow }: Protec
             <button
               type="button"
               onClick={onClose}
-              className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center font-bold text-sm transition"
-              title={isArabic ? "إغلاق" : "Tutup"}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition border border-slate-700"
+              title={isArabic ? "العودة / إغلاق" : "Kembali / Tutup"}
             >
-              ✕
+              <span>{isArabic ? "العودة / إغلاق" : "Kembali / Tutup"}</span>
+              <span>✕</span>
             </button>
           </div>
         </div>
@@ -430,9 +431,10 @@ export function ProtectedPosterModal({ pkg, poster, onClose, onBookNow }: Protec
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-300 font-bold transition text-xs"
+              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-300 hover:text-white font-bold transition text-xs inline-flex items-center justify-center gap-1.5"
             >
-              {isArabic ? "إغلاق" : "Tutup"}
+              <span>←</span>
+              <span>{isArabic ? "العودة" : "Kembali"}</span>
             </button>
 
             {onBookNow && (

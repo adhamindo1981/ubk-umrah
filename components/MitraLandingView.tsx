@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/LanguageContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { BackButton } from "@/components/BackButton";
 import { UbkLogo } from "@/components/UbkLogo";
 import { IslamicPattern } from "@/components/IslamicPattern";
 import { MitraTermsModal } from "@/components/MitraTermsModal";
@@ -82,7 +83,8 @@ export function MitraLandingView({
       {/* Navigation Header */}
       <header className="border-b border-amber-500/20 bg-slate-950/95 backdrop-blur-md sticky top-0 z-40 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <BackButton fallbackUrl="/" />
             <Link href="/" className="hover:opacity-90 transition">
               <UbkLogo size="sm" variant="dark" showSubtitle={false} animated={true} />
             </Link>
