@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
 
 interface PosterOrder {
@@ -37,7 +37,13 @@ export function AdminPosterManagementModal() {
   const [loading, setLoading] = useState(false);
   const [processingId, setProcessingId] = useState<number | null>(null);
 
-  // New Template Form State (For Designer / Admin)
+  // Publish Mode: "upload" (Designer custom artwork) or "studio" (Automated SVG)
+  const [publishMode, setPublishMode] = useState<"upload" | "studio">("upload");
+  const [selectedFileBase64, setSelectedFileBase64] = useState<string>("");
+  const [customImageUrl, setCustomImageUrl] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Template Form State
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [packagePrice, setPackagePrice] = useState("Rp 29.900.000");
@@ -107,10 +113,32 @@ export function AdminPosterManagementModal() {
     }
   }
 
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert(isArabic ? "حجم الصورة كبير جداً، الحد الأقصى 10 ميجابايت" : "Ukuran foto terlalu besar, maksimal 10MB");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setSelectedFileBase64(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  }
+
   async function handlePublishSubmit(e: React.FormEvent) {
     e.preventDefault();
     setPublishLoading(true);
     setPublishMsg(null);
+
+    if (publishMode === "upload" && !selectedFileBase64 && !customImageUrl) {
+      alert(isArabic ? "يرجى اختيار صورة البوستر المصمم من جهازك أو وضع رابط الصورة" : "Silakan unggah file desain poster atau masukkan tautan URL");
+      setPublishLoading(false);
+      return;
+    }
 
     const themeColors = {
       emerald: { bgStart: "#022c22", bgEnd: "#064e3b" },
@@ -133,6 +161,8 @@ export function AdminPosterManagementModal() {
           category,
           bgStart: colors.bgStart,
           bgEnd: colors.bgEnd,
+          imageBase64: selectedFileBase64 || undefined,
+          uploadedImageUrl: customImageUrl.trim() || undefined,
         }),
       });
 
@@ -147,7 +177,10 @@ export function AdminPosterManagementModal() {
         );
         setTitle("");
         setSubtitle("");
-        setTimeout(() => setPublishMsg(null), 3000);
+        setSelectedFileBase64("");
+        setCustomImageUrl("");
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        setTimeout(() => setPublishMsg(null), 3500);
       } else {
         setPublishMsg(data.error || "Gagal menerbitkan poster.");
       }
@@ -190,8 +223,8 @@ export function AdminPosterManagementModal() {
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">
                   {isArabic
-                    ? "أنت المخول الوحيد بنشر قوالب جديدة وتأكيد مبيعات البوستات المدفوعة بالتحويل البنكي."
-                    : "Anda adalah desainer resmi yang berhak menerbitkan desain dan memverifikasi pembayaran transfer mitra."}
+                    ? "نشر التصاميم المصممة خارجياً ودمج باركود وبيانات المسوقين آلياً فور الشراء."
+                    : "Terbitkan desain eksternal (Photoshop/Canva) dan sistem otomatis menyematkan barcode QR serta data mitra."}
                 </p>
               </div>
 
@@ -230,7 +263,7 @@ export function AdminPosterManagementModal() {
                     : "bg-white text-slate-600 hover:bg-slate-200 border border-slate-200"
                 }`}
               >
-                ➕ {isArabic ? "نشر وتصميم بوستر جديد" : "Terbitkan Desain Poster Baru"}
+                ➕ {isArabic ? "رفع ونشر بوستر جديد" : "Unggah & Terbitkan Desain Baru"}
               </button>
             </div>
 
@@ -279,26 +312,23 @@ export function AdminPosterManagementModal() {
                                     : "bg-purple-100 text-purple-900"
                                 }`}
                               >
-                                {o.paymentMethod === "FREE_STARTER"
-                                  ? (isArabic ? "بداية مجاني" : "Gratis Awal")
-                                  : o.paymentMethod === "COMMISSION_BALANCE"
-                                  ? (isArabic ? "خصم رصيد" : "Potong Saldo")
-                                  : (isArabic ? "تحويل بنكي" : "Transfer Bank")}
+                                {o.paymentMethod}
                               </span>
                             </td>
-                            <td className="px-4 py-3.5 font-bold font-mono text-emerald-700">
+                            <td className="px-4 py-3.5 font-bold font-mono text-slate-900">
                               Rp {o.pricePaid.toLocaleString("id-ID")}
                             </td>
                             <td className="px-4 py-3.5">
                               {o.receiptImageUrl ? (
                                 <button
+                                  type="button"
                                   onClick={() => setViewReceiptUrl(o.receiptImageUrl)}
-                                  className="text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-lg transition"
+                                  className="text-emerald-600 hover:text-emerald-700 font-bold underline cursor-pointer"
                                 >
-                                  👁️ {isArabic ? "معاينة الإيصال" : "Lihat Bukti"}
+                                  {isArabic ? "عرض الإيصال 📄" : "Lihat Struk 📄"}
                                 </button>
                               ) : (
-                                <span className="text-[10px] text-slate-400">-</span>
+                                <span className="text-slate-400">-</span>
                               )}
                             </td>
                             <td className="px-4 py-3.5">
@@ -307,24 +337,24 @@ export function AdminPosterManagementModal() {
                                   <button
                                     onClick={() => handleApprove(o.id)}
                                     disabled={processingId === o.id}
-                                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-2.5 py-1 rounded-lg text-[11px] transition shadow-xs disabled:opacity-50"
+                                    className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition disabled:opacity-50"
                                   >
-                                    ✓ {isArabic ? "اعتماد" : "Setujui"}
+                                    {processingId === o.id ? "..." : (isArabic ? "اعتماد وترخيص ✅" : "Setujui ✅")}
                                   </button>
                                   <button
                                     onClick={() => handleReject(o.id)}
                                     disabled={processingId === o.id}
-                                    className="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold px-2.5 py-1 rounded-lg text-[11px] transition disabled:opacity-50"
+                                    className="px-2.5 py-1 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded-lg transition disabled:opacity-50"
                                   >
-                                    ✕ {isArabic ? "رفض" : "Tolak"}
+                                    {isArabic ? "رفض" : "Tolak"}
                                   </button>
                                 </div>
                               ) : (
                                 <span
-                                  className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                                  className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${
                                     o.paymentStatus === "APPROVED"
                                       ? "bg-emerald-100 text-emerald-800"
-                                      : "bg-rose-100 text-rose-800"
+                                      : "bg-red-100 text-red-800"
                                   }`}
                                 >
                                   {o.paymentStatus === "APPROVED"
@@ -344,16 +374,46 @@ export function AdminPosterManagementModal() {
                 )
               ) : (
                 /* Publish New Template Form */
-                <form onSubmit={handlePublishSubmit} className="max-w-xl mx-auto space-y-4 py-2">
-                  <div className="border-b pb-3 mb-2">
-                    <h3 className="text-sm font-black text-slate-900">
-                      {isArabic ? "نشر وتصميم قالب بوستر عمرة جديد" : "Formulir Penerbitan Desain Poster Baru"}
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      {isArabic
-                        ? "سيقوم النظام تلقائياً بإنشاء النسخة المحمية بالعلامة المائية مع حجز مكان ختم بيانات المسوقين."
-                        : "Sistem otomatis membuatkan versi preview ber-watermark dan menyiapkan slot otomatis untuk data mitra."}
-                    </p>
+                <form onSubmit={handlePublishSubmit} className="max-w-2xl mx-auto space-y-5 py-2">
+                  <div className="border-b pb-3 mb-2 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <h3 className="text-base font-black text-slate-900">
+                        {isArabic ? "رفع ونشر قالب بوستر عمرة جديد" : "Formulir Penerbitan Desain Poster Baru"}
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        {isArabic
+                          ? "اختر رفع ملف مصمم في برامج خارجية (Photoshop / Canva) أو إنشاء قالب برمجي تلقائي."
+                          : "Unggah materi desain eksternal atau buat otomatis melalui studio sistem."}
+                      </p>
+                    </div>
+
+                    {/* Mode Selector Toggle */}
+                    <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => setPublishMode("upload")}
+                        className={`px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 ${
+                          publishMode === "upload"
+                            ? "bg-emerald-600 text-white shadow-xs"
+                            : "text-slate-600 hover:text-slate-900"
+                        }`}
+                      >
+                        <span>📁</span>
+                        <span>{isArabic ? "رفع تصميم خارجي (فوتوشوب/كانفا)" : "Unggah Desain Eksternal"}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPublishMode("studio")}
+                        className={`px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 ${
+                          publishMode === "studio"
+                            ? "bg-slate-900 text-white shadow-xs"
+                            : "text-slate-600 hover:text-slate-900"
+                        }`}
+                      >
+                        <span>🎨</span>
+                        <span>{isArabic ? "استوديو تلقائي (SVG)" : "Studio SVG Otomatis"}</span>
+                      </button>
+                    </div>
                   </div>
 
                   {publishMsg && (
@@ -362,6 +422,83 @@ export function AdminPosterManagementModal() {
                     </div>
                   )}
 
+                  {/* Mode 1: External Designer File Upload */}
+                  {publishMode === "upload" && (
+                    <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 border-2 border-dashed border-emerald-400 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-black text-slate-800">
+                          {isArabic ? "ملف صورة البوستر المصمم (PNG / JPG / WebP):" : "File Desain Poster (PNG / JPG / WebP):"}
+                        </label>
+                        <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">
+                          {isArabic ? "أقصى حجم: 10MB" : "Maks 10MB"}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row items-center gap-4">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          onChange={handleFileChange}
+                          className="block w-full text-xs text-slate-500 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer"
+                        />
+                        <span className="text-xs text-slate-400 font-bold shrink-0">{isArabic ? "أو" : "atau"}</span>
+                        <input
+                          type="url"
+                          placeholder={isArabic ? "رابط الصورة (Google Drive / CDN)..." : "Tautan Gambar URL..."}
+                          value={customImageUrl}
+                          onChange={(e) => setCustomImageUrl(e.target.value)}
+                          className="w-full sm:w-1/2 px-3 py-2 text-xs border border-slate-300 rounded-xl outline-none"
+                        />
+                      </div>
+
+                      {/* Image Preview Thumbnail */}
+                      {(selectedFileBase64 || customImageUrl) && (
+                        <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-200">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={selectedFileBase64 || customImageUrl}
+                            alt="Design Preview"
+                            className="w-20 h-20 object-cover rounded-lg border border-slate-300 shadow-sm"
+                          />
+                          <div className="text-xs space-y-1 flex-1">
+                            <strong className="text-slate-900 block">{isArabic ? "تم اختيار صورة التصميم بنجاح" : "File desain siap diterbitkan"}</strong>
+                            <p className="text-slate-500 text-[11px]">
+                              {isArabic
+                                ? "سيقوم النظام بحفظ التصميم كأصل عالي الدقة وإضافة شريط باركود المسوق ورقم واتسابه في الأسفل تلقائياً."
+                                : "Sistem otomatis menyiapkan slot barcode QR dan data kontak mitra di bagian bawah."}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedFileBase64("");
+                              setCustomImageUrl("");
+                              if (fileInputRef.current) fileInputRef.current.value = "";
+                            }}
+                            className="text-xs text-red-600 hover:text-red-700 font-bold px-2 py-1 bg-red-50 hover:bg-red-100 rounded-lg transition"
+                          >
+                            {isArabic ? "إلغاء ✕" : "Hapus ✕"}
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Architecture Explanation Banner */}
+                      <div className="p-3.5 bg-emerald-950 text-slate-200 rounded-xl text-xs space-y-1.5 border border-amber-500/40">
+                        <strong className="text-amber-400 flex items-center gap-1.5">
+                          <span>💡</span>
+                          <span>{isArabic ? "كيف يتم ختم بيانات والباركود الخاص بالمسوق؟" : "Bagaimana Barcode & Kontak Mitra Disematkan?"}</span>
+                        </strong>
+                        <p className="text-[11px] text-slate-300 leading-relaxed">
+                          {isArabic
+                            ? "يقوم النظام تلقائياً بدمج التصميم المرفوع، وإلحاق شريط رسمي في أسفل البوستر يحتوي على: باركود (QR Code) ذكي برابط صفحة المسوق المباشرة، واسمه المعتمد، ورقم واتسابه، وكود ترخيص الملكية الفكرية (UBK-LIC)."
+                            : "Sistem otomatis melampirkan footer branding terenkripsi di bawah poster yang memuat: Barcode QR langsung ke link mitra, Nama Konsultan, WhatsApp, dan Nomor Lisensi Resmi saat mitra membeli."}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Common Fields */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
                       {isArabic ? "عنوان البوستر الرئيسي (مثل: باقة عمرة شوال 1448هـ)" : "Judul Utama Poster:"}
@@ -434,31 +571,33 @@ export function AdminPosterManagementModal() {
                       </select>
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        {isArabic ? "السمة اللونية للتصميم:" : "Tema Warna Poster:"}
-                      </label>
-                      <select
-                        value={bgTheme}
-                        onChange={(e) => setBgTheme(e.target.value as any)}
-                        className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl outline-none"
-                      >
-                        <option value="emerald">Zamrud Hijau (Islamic Emerald)</option>
-                        <option value="black">Hitam Emas Kerajaan (Luxury Black Gold)</option>
-                        <option value="navy">Biru Malam Elegan (Midnight Navy)</option>
-                        <option value="purple">Ungu Berkah Ramadhan (Royal Purple)</option>
-                      </select>
-                    </div>
+                    {publishMode === "studio" && (
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          {isArabic ? "السمة اللونية للتصميم:" : "Tema Warna Poster:"}
+                        </label>
+                        <select
+                          value={bgTheme}
+                          onChange={(e) => setBgTheme(e.target.value as any)}
+                          className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl outline-none"
+                        >
+                          <option value="emerald">Zamrud Hijau (Islamic Emerald)</option>
+                          <option value="black">Hitam Emas Kerajaan (Luxury Black Gold)</option>
+                          <option value="navy">Biru Malam Elegan (Midnight Navy)</option>
+                          <option value="purple">Ungu Berkah Ramadhan (Royal Purple)</option>
+                        </select>
+                      </div>
+                    )}
                   </div>
 
                   <button
                     type="submit"
                     disabled={publishLoading}
-                    className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-lg transition disabled:opacity-50 mt-4"
+                    className="w-full py-4 bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500 hover:from-emerald-500 hover:to-amber-400 text-slate-950 font-black text-xs sm:text-sm rounded-2xl shadow-xl transition active:scale-95 disabled:opacity-50 mt-4 cursor-pointer"
                   >
                     {publishLoading
-                      ? (isArabic ? "جاري إنشاء ونشر التصميم..." : "Sedang Menerbitkan...")
-                      : (isArabic ? "نشر التصميم في المتجر فوراً 🚀" : "Terbitkan ke Marketplace Sekarang 🚀")}
+                      ? (isArabic ? "جاري رفع ونشر التصميم..." : "Sedang Menerbitkan...")
+                      : (isArabic ? "نشر التصميم في متجر المسوقين فوراً 🚀" : "Terbitkan ke Marketplace Sekarang 🚀")}
                   </button>
                 </form>
               )}

@@ -2,10 +2,105 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
+import { normalizeImageUrl } from "@/lib/imageUtils";
+import fs from "fs";
+import path from "path";
 
+/**
+ * Generate SVG with Watermark for previewing
+ */
+function createWatermarkedSvgWrapper(imageUrl: string, title: string, category: string): { cleanSvg: string; previewSvg: string } {
+  // Determine aspect ratio dimensions based on category
+  let width = 1080;
+  let height = 1080;
+  let imgHeight = 940;
+  let slotY = 940;
+  let slotHeight = 140;
 
+  if (category === "INSTAGRAM_STORY") {
+    width = 1080;
+    height = 1920;
+    imgHeight = 1740;
+    slotY = 1740;
+    slotHeight = 180;
+  } else if (category === "BANNER") {
+    width = 1920;
+    height = 1080;
+    imgHeight = 930;
+    slotY = 930;
+    slotHeight = 150;
+  }
 
-function generateCustomTemplateSvg(title: string, subtitle: string, price: string, bgStart: string, bgEnd: string, isWatermarked = false) {
+  const watermarkOverlay = `
+    <g transform="rotate(-32 ${width / 2} ${height / 2})" opacity="0.32">
+      <rect x="-300" y="${height / 2 - 60}" width="${width + 600}" height="120" fill="rgba(220, 38, 38, 0.3)" rx="20"/>
+      <text x="${width / 2}" y="${height / 2 + 15}" font-family="Arial, sans-serif" font-size="40" font-weight="900" fill="#dc2626" text-anchor="middle" letter-spacing="4">
+        UBK UMRAH • PRATINJAU DESAIN RESMI • HAK CIPTA DILINDUNGI
+      </text>
+    </g>
+  `;
+
+  const brandingSlot = `
+    <g id="marketer-branding-slot">
+      <!-- Dark Emerald & Gold Luxury Footer Strip -->
+      <rect x="0" y="${slotY}" width="${width}" height="${slotHeight}" fill="#022c22" stroke="#d97706" stroke-width="3"/>
+      
+      <!-- Marketer QR Code Slot (Dynamic) -->
+      <g transform="translate(30, ${slotY + 15})">
+        <rect width="${slotHeight - 30}" height="${slotHeight - 30}" rx="12" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
+        <image id="branding-qr" href="{{MARKETER_QR}}" x="4" y="4" width="${slotHeight - 38}" height="${slotHeight - 38}" preserveAspectRatio="xMidYMid meet"/>
+      </g>
+
+      <!-- Marketer Profile Info -->
+      <g transform="translate(${slotHeight + 25}, ${slotY + 35})">
+        <text font-family="'Cairo', sans-serif" font-size="14" font-weight="800" fill="#fbbf24" letter-spacing="1">
+          KONSULTAN RESMI BERLISENSI / المسوق المعتمد:
+        </text>
+        <text id="branding-name" y="32" font-family="'Plus Jakarta Sans', sans-serif" font-size="24" font-weight="900" fill="#ffffff">
+          {{MARKETER_NAME}}
+        </text>
+        <text id="branding-wa" y="62" font-family="monospace" font-size="16" font-weight="700" fill="#34d399">
+          📲 WhatsApp: {{MARKETER_WHATSAPP}} | Kode: {{MARKETER_CODE}}
+        </text>
+      </g>
+
+      <!-- Security Digital License Badge -->
+      <g transform="translate(${width - 270}, ${slotY + 22})">
+        <rect width="245" height="${slotHeight - 44}" rx="16" fill="rgba(15, 23, 42, 0.85)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="122" y="24" font-family="sans-serif" font-size="11" font-weight="800" fill="#94a3b8" text-anchor="middle">
+          LISENSI RESMI UBK UMRAH
+        </text>
+        <text id="branding-lic" x="122" y="48" font-family="monospace" font-size="12" font-weight="900" fill="#fef08a" text-anchor="middle">
+          {{LICENSE_KEY}}
+        </text>
+        <text x="122" y="70" font-family="sans-serif" font-size="9" font-weight="700" fill="#34d399" text-anchor="middle">
+          PPIU Kemenag No. U-271/2021
+        </text>
+      </g>
+    </g>
+  `;
+
+  const cleanSvg = `
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+      <!-- Designer's Master Artwork -->
+      <image href="${imageUrl}" x="0" y="0" width="${width}" height="${imgHeight}" preserveAspectRatio="xMidYMid slice" />
+      ${brandingSlot}
+    </svg>
+  `.trim();
+
+  const previewSvg = `
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+      <!-- Designer's Master Artwork -->
+      <image href="${imageUrl}" x="0" y="0" width="${width}" height="${imgHeight}" preserveAspectRatio="xMidYMid slice" />
+      ${brandingSlot}
+      ${watermarkOverlay}
+    </svg>
+  `.trim();
+
+  return { cleanSvg, previewSvg };
+}
+
+function generateStudioTemplateSvg(title: string, subtitle: string, price: string, bgStart: string, bgEnd: string, isWatermarked = false) {
   const watermarkOverlay = isWatermarked
     ? `
     <g transform="rotate(-35 540 540)" opacity="0.38">
@@ -18,7 +113,7 @@ function generateCustomTemplateSvg(title: string, subtitle: string, price: strin
     : "";
 
   return `
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1080 1080" width="1080" height="1080">
     <defs>
       <linearGradient id="bg_dyn" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="${bgStart}"/>
@@ -64,15 +159,20 @@ function generateCustomTemplateSvg(title: string, subtitle: string, price: strin
     </g>
     <g id="marketer-branding-slot">
       <rect x="40" y="900" width="1000" height="140" rx="28" fill="#ffffff" stroke="url(#gold_dyn)" stroke-width="3"/>
-      <circle cx="110" cy="970" r="42" fill="#047857"/>
-      <text x="110" y="982" font-family="sans-serif" font-size="34" font-weight="900" fill="#ffffff" text-anchor="middle">🕋</text>
-      <text x="180" y="948" font-family="sans-serif" font-size="15" font-weight="800" fill="#047857" letter-spacing="1">
+      
+      <!-- Marketer QR Code Slot -->
+      <g transform="translate(60, 915)">
+        <rect width="110" height="110" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <image id="branding-qr" href="{{MARKETER_QR}}" x="5" y="5" width="100" height="100" preserveAspectRatio="xMidYMid meet"/>
+      </g>
+
+      <text x="190" y="948" font-family="sans-serif" font-size="15" font-weight="800" fill="#047857" letter-spacing="1">
         KONSULTASI RESMI BERSAMA MITRA:
       </text>
-      <text id="branding-name" x="180" y="980" font-family="sans-serif" font-size="26" font-weight="900" fill="#0f172a">
+      <text id="branding-name" x="190" y="980" font-family="sans-serif" font-size="26" font-weight="900" fill="#0f172a">
         {{MARKETER_NAME}}
       </text>
-      <text id="branding-wa" x="180" y="1012" font-family="monospace" font-size="18" font-weight="700" fill="#15803d">
+      <text id="branding-wa" x="190" y="1012" font-family="monospace" font-size="18" font-weight="700" fill="#15803d">
         📲 WhatsApp: {{MARKETER_WHATSAPP}} | Kode: {{MARKETER_CODE}}
       </text>
       <rect x="790" y="920" width="225" height="100" rx="16" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
@@ -99,32 +199,78 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { title, subtitle, packagePrice, posterPrice, description, category, bgStart, bgEnd } = await req.json();
+    const body = await req.json();
+    const {
+      title,
+      subtitle,
+      packagePrice,
+      posterPrice,
+      description,
+      category,
+      bgStart,
+      bgEnd,
+      imageBase64,
+      uploadedImageUrl,
+    } = body;
 
-    if (!title || !posterPrice) {
+    if (!title || posterPrice === undefined || posterPrice === null) {
       return NextResponse.json({ error: "Judul dan harga poster wajib diisi" }, { status: 400 });
     }
 
-    const cleanSvg = generateCustomTemplateSvg(
-      title,
-      subtitle || "Program Ibadah Khusyuk UBK Umrah",
-      packagePrice || "Rp 29.900.000",
-      bgStart || "#064e3b",
-      bgEnd || "#022c22",
-      false
-    );
+    let finalImageUrl = normalizeImageUrl(uploadedImageUrl) || "";
 
-    const previewSvg = generateCustomTemplateSvg(
-      title,
-      subtitle || "Program Ibadah Khusyuk UBK Umrah",
-      packagePrice || "Rp 29.900.000",
-      bgStart || "#064e3b",
-      bgEnd || "#022c22",
-      true
-    );
+    // If an image file was uploaded as base64, save to public/uploads/posters/
+    if (imageBase64 && imageBase64.startsWith("data:image")) {
+      const matches = imageBase64.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+      if (matches && matches.length === 3) {
+        const ext = matches[1].split("/")[1] || "jpg";
+        const buffer = Buffer.from(matches[2], "base64");
+        const filename = `poster-${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${ext}`;
+        const uploadDir = path.join(process.cwd(), "public", "uploads", "posters");
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        const filePath = path.join(uploadDir, filename);
+        fs.writeFileSync(filePath, buffer);
+        finalImageUrl = `/uploads/posters/${filename}`;
+      }
+    }
 
-    const cleanImageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(cleanSvg)}`;
-    const previewImageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(previewSvg)}`;
+    let cleanImageUrl = "";
+    let previewImageUrl = "";
+
+    // CASE A: Designer uploaded their own custom image (Photoshop / Canva / Figma)
+    if (finalImageUrl) {
+      const { cleanSvg, previewSvg } = createWatermarkedSvgWrapper(
+        finalImageUrl,
+        title,
+        category || "INSTAGRAM_FEED"
+      );
+      cleanImageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(cleanSvg)}`;
+      previewImageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(previewSvg)}`;
+    } else {
+      // CASE B: Studio automatic generated SVG template
+      const cleanSvg = generateStudioTemplateSvg(
+        title,
+        subtitle || "Program Ibadah Khusyuk UBK Umrah",
+        packagePrice || "Rp 29.900.000",
+        bgStart || "#064e3b",
+        bgEnd || "#022c22",
+        false
+      );
+
+      const previewSvg = generateStudioTemplateSvg(
+        title,
+        subtitle || "Program Ibadah Khusyuk UBK Umrah",
+        packagePrice || "Rp 29.900.000",
+        bgStart || "#064e3b",
+        bgEnd || "#022c22",
+        true
+      );
+
+      cleanImageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(cleanSvg)}`;
+      previewImageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(previewSvg)}`;
+    }
 
     const newTemplate = await prisma.posterTemplate.create({
       data: {

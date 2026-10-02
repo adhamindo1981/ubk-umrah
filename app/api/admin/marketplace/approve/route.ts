@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
+import { generateQRCodeDataUrl } from "@/lib/referral";
 
 
 
@@ -27,12 +28,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Poster record not found" }, { status: 404 });
     }
 
+    // Generate live QR code for marketer's personal page
+    const personalPageUrl = poster.marketer.referralCode
+      ? `https://ubk-umrah.vercel.app/m/${poster.marketer.referralCode}`
+      : "https://ubk-umrah.vercel.app";
+    const qrDataUrl = await generateQRCodeDataUrl(personalPageUrl);
+
     // Stamp branding
     const cleanSvg = decodeURIComponent(poster.template.cleanImageUrl.replace("data:image/svg+xml;utf8,", ""));
     const brandedSvg = cleanSvg
       .replace("{{MARKETER_NAME}}", poster.marketer.username.toUpperCase())
       .replace("{{MARKETER_WHATSAPP}}", poster.marketer.whatsapp || "Hubungi Admin UBK")
       .replace("{{MARKETER_CODE}}", poster.marketer.referralCode || "UBK-PARTNER")
+      .replace("{{MARKETER_QR}}", qrDataUrl)
       .replace("{{LICENSE_KEY}}", poster.licenseKey);
 
     const customizedImageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(brandedSvg)}`;

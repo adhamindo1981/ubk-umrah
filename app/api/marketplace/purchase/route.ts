@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
+import { generateQRCodeDataUrl } from "@/lib/referral";
 
 
 
@@ -128,11 +129,17 @@ export async function POST(req: Request) {
     // Stamp marketer branding onto clean template (if approved)
     let customizedImageUrl: string | null = null;
     if (finalPaymentStatus === "APPROVED") {
+      const personalPageUrl = user.referralCode
+        ? `https://ubk-umrah.vercel.app/m/${user.referralCode}`
+        : "https://ubk-umrah.vercel.app";
+      const qrDataUrl = await generateQRCodeDataUrl(personalPageUrl);
+
       const cleanSvg = decodeURIComponent(template.cleanImageUrl.replace("data:image/svg+xml;utf8,", ""));
       const brandedSvg = cleanSvg
         .replace("{{MARKETER_NAME}}", user.username.toUpperCase())
         .replace("{{MARKETER_WHATSAPP}}", user.whatsapp || "Hubungi Admin UBK")
         .replace("{{MARKETER_CODE}}", user.referralCode || "UBK-PARTNER")
+        .replace("{{MARKETER_QR}}", qrDataUrl)
         .replace("{{LICENSE_KEY}}", licenseKey);
 
       customizedImageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(brandedSvg)}`;
