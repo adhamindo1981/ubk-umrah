@@ -264,7 +264,10 @@ export function AdminPageView({
                     const totalRedeemedIDR = m.payoutRequests
                       .filter((p: any) => p.status !== "REJECTED")
                       .reduce((sum: number, p: any) => sum + p.amount, 0);
-                    const availableIDR = totalEarnedIDR - totalRedeemedIDR;
+                    const totalPosterPurchasesIDR = ((m as any).purchasedPosters || [])
+                      .filter((p: any) => p.paymentMethod === "COMMISSION_BALANCE" && p.paymentStatus === "APPROVED")
+                      .reduce((sum: number, p: any) => sum + (p.pricePaid || 0), 0);
+                    const availableIDR = Math.max(0, totalEarnedIDR - totalRedeemedIDR - totalPosterPurchasesIDR);
 
                     const profileData: MarketerProfileData = {
                       id: m.id,

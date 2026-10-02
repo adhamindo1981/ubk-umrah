@@ -72,6 +72,7 @@ export default async function AdminPage() {
       payoutRequests: {
         orderBy: { createdAt: "desc" },
       },
+      purchasedPosters: true,
     },
     orderBy: { createdAt: "desc" },
   });

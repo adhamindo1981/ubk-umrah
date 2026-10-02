@@ -49,6 +49,7 @@ export async function POST(request: Request) {
       include: {
         rewards: true,
         payoutRequests: true,
+        purchasedPosters: true,
       },
     });
 
@@ -61,8 +62,11 @@ export async function POST(request: Request) {
     const totalRedeemedIDR = user.payoutRequests
       .filter((p) => p.status !== "REJECTED")
       .reduce((sum, p) => sum + p.amount, 0);
+    const totalPosterPurchasesIDR = user.purchasedPosters
+      .filter((p) => p.paymentMethod === "COMMISSION_BALANCE" && p.paymentStatus === "APPROVED")
+      .reduce((sum, p) => sum + p.pricePaid, 0);
 
-    const availableIDR = totalEarnedIDR - totalRedeemedIDR;
+    const availableIDR = Math.max(0, totalEarnedIDR - totalRedeemedIDR - totalPosterPurchasesIDR);
 
     if (availableIDR < MIN_PAYOUT_IDR) {
       return NextResponse.json(
