@@ -5,7 +5,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { BackButton } from "@/components/BackButton";
 import { InviteMarketerModal } from "@/components/InviteMarketerModal";
 import { AdminPayoutAction } from "@/app/admin/AdminPayoutAction";
-import { AdminPointsEditor } from "@/app/admin/AdminPointsEditor";
+import { AdminBalanceEditor } from "@/app/admin/AdminPointsEditor";
 import { MarketerApprovalToggle } from "@/app/admin/MarketerApprovalToggle";
 import { AdminMarketerProfileModal, MarketerProfileData } from "@/app/admin/AdminMarketerProfileModal";
 import { OrderStatusSelector } from "@/app/admin/OrderStatusSelector";
@@ -337,7 +337,11 @@ export function AdminPageView({
                           Rp {availableIDR.toLocaleString("id-ID")}
                         </td>
                         <td className="px-6 py-4">
-                          <AdminPointsEditor marketerId={m.id} currentPoints={Math.round(availableIDR / 1000)} />
+                          <AdminBalanceEditor
+                            marketerId={m.id}
+                            marketerName={m.username}
+                            currentBalanceIDR={availableIDR}
+                          />
                         </td>
                         <td className="px-6 py-4">
                           <MarketerApprovalToggle
