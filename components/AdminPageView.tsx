@@ -8,6 +8,7 @@ import { AdminPayoutAction } from "@/app/admin/AdminPayoutAction";
 import { AdminBalanceEditor } from "@/app/admin/AdminPointsEditor";
 import { MarketerApprovalToggle } from "@/app/admin/MarketerApprovalToggle";
 import { AdminMarketerProfileModal, MarketerProfileData } from "@/app/admin/AdminMarketerProfileModal";
+import { AdminAccountStatementModal, StatementMarketerData } from "@/app/admin/AdminAccountStatementModal";
 import { OrderStatusSelector } from "@/app/admin/OrderStatusSelector";
 import { AdminPosterManagementModal } from "@/components/AdminPosterManagementModal";
 import { AdminPackagesManagementModal } from "@/components/AdminPackagesManagementModal";
@@ -309,6 +310,26 @@ export function AdminPageView({
                       })),
                     };
 
+                    const statementData: StatementMarketerData = {
+                      id: m.id,
+                      username: m.username,
+                      email: m.email,
+                      whatsapp: m.whatsapp,
+                      referralCode: m.referralCode,
+                      isApproved: m.isApproved,
+                      bankName: m.bankName,
+                      bankAccountNumber: m.bankAccountNumber,
+                      bankAccountName: m.bankAccountName,
+                      idNumber: m.idNumber,
+                      parentMarketerName: m.parent ? m.parent.username : null,
+                      subMarketerShare: m.subMarketerShare || 350000,
+                      subMarketersCount: m.subMarketers.length,
+                      createdAt: m.createdAt,
+                      rewards: m.rewards || [],
+                      payoutRequests: m.payoutRequests || [],
+                      purchasedPosters: (m as any).purchasedPosters || [],
+                    };
+
                     return (
                       <tr key={m.id} className="hover:bg-slate-50/50 transition">
                         <td className="px-6 py-4">
@@ -334,7 +355,10 @@ export function AdminPageView({
                           {m.referralCode || (isArabic ? "بانتظار التفعيل" : "Menunggu")}
                         </td>
                         <td className="px-6 py-4">
-                          <AdminMarketerProfileModal marketer={profileData} />
+                          <div className="flex flex-col gap-1.5 items-start">
+                            <AdminMarketerProfileModal marketer={profileData} />
+                            <AdminAccountStatementModal marketer={statementData} />
+                          </div>
                         </td>
                         <td className="px-6 py-4 font-bold text-slate-900 font-mono text-xs">
                           Rp {availableIDR.toLocaleString("id-ID")}
