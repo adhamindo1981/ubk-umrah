@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الملف التعريفي التنفيذي - عمر بن الخطاب للعمرة (UBK)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: A4;
+      margin: 12mm 15mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif;
+      background-color: #ffffff;
+      color: #0f172a;
+      line-height: 1.5;
+      font-size: 11pt;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page {
+      page-break-after: always;
+      position: relative;
+      padding: 10px 0;
+    }
+    .page:last-child {
+      page-break-after: auto;
+    }
+    
+    /* Cover Page */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 250mm;
+      background: linear-gradient(135deg, #022c22 0%, #064e3b 50%, #022c22 100%);
+      color: #ffffff;
+      border-radius: 20px;
+      padding: 40px;
+      border: 3px solid #d97706;
+      position: relative;
+      overflow: hidden;
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(217, 119, 6, 0.2);
+      border: 1px solid #fbbf24;
+      color: #fef08a;
+      border-radius: 9999px;
+      font-weight: 800;
+      font-size: 10pt;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+    .cover h1 {
+      font-size: 32pt;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    .cover h2 {
+      font-size: 16pt;
+      font-weight: 700;
+      color: #fbbf24;
+      margin-bottom: 20px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      direction: ltr;
+    }
+    .cover p {
+      font-size: 12pt;
+      color: #cbd5e1;
+      max-width: 650px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 700px;
+      margin-top: 20px;
+    }
+    .meta-box {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      padding: 12px 8px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .meta-label {
+      font-size: 8pt;
+      color: #94a3b8;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .meta-val {
+      font-size: 10pt;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+
+    /* Section Styling */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 2px solid #059669;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      margin-top: 15px;
+    }
+    .section-icon {
+      font-size: 18pt;
+      background: #ecfdf5;
+      border: 1px solid #10b981;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+    }
+    .section-title {
+      font-size: 18pt;
+      font-weight: 900;
+      color: #064e3b;
+    }
+    .section-sub {
+      font-size: 9pt;
+      color: #64748b;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      direction: ltr;
+      text-align: right;
+    }
+
+    /* Bilingual Two Columns */
+    .bilingual-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .col-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .col-card.ar {
+      direction: rtl;
+      text-align: right;
+      border-right: 4px solid #059669;
+    }
+    .col-card.id {
+      direction: ltr;
+      text-align: left;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      border-left: 4px solid #d97706;
+    }
+    .col-title {
+      font-size: 12pt;
+      font-weight: 800;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .col-card.ar .col-title { color: #064e3b; }
+    .col-card.id .col-title { color: #b45309; }
+
+    /* Problem / Solution Cards */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 15px;
+    }
+    .problem-box {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+    .problem-title {
+      color: #b91c1c;
+      font-weight: 800;
+      font-size: 10.5pt;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .solution-title {
+      color: #047857;
+      font-weight: 800;
+      font-size: 10.5pt;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .problem-desc {
+      font-size: 9pt;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    /* Architecture Features List */
+    .arch-card {
+      background: #fdfdfd;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 12px;
+    }
+    .arch-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .arch-name {
+      font-size: 12pt;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .arch-route {
+      background: #f1f5f9;
+      color: #0f172a;
+      font-family: monospace;
+      font-size: 9pt;
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+    }
+    .arch-features {
+      list-style: none;
+      font-size: 9.5pt;
+      color: #334155;
+    }
+    .arch-features li {
+      margin-bottom: 5px;
+      position: relative;
+      padding-right: 18px;
+    }
+    .arch-features li::before {
+      content: "✓";
+      color: #059669;
+      font-weight: bold;
+      position: absolute;
+      right: 0;
+    }
+
+    /* Commission Box */
+    .commission-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 15px 0;
+    }
+    .comm-card {
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+    }
+    .comm-card.direct {
+      background: #ecfdf5;
+      border: 2px solid #10b981;
+    }
+    .comm-card.team {
+      background: #fffbeb;
+      border: 2px solid #f59e0b;
+    }
+    .comm-amount {
+      font-size: 26pt;
+      font-weight: 900;
+      margin: 8px 0;
+      font-family: monospace;
+    }
+    .comm-card.direct .comm-amount { color: #047857; }
+    .comm-card.team .comm-amount { color: #b45309; }
+
+    /* Footer stamp */
+    .page-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 10px;
+      margin-top: 25px;
+      font-size: 8pt;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= PAGE 1: COVER ================= -->
+  <div class="page">
+    <div class="cover">
+      <div class="badge">تقرير الإدارة العليا • LAPORAN EKSEKUTIF DIREKSI</div>
+      <h1>منظومة عمر بن الخطاب للعمرة (UBK)</h1>
+      <h2>Platform Digital Terpadu Manajemen Program Umrah & Kemitraan Afiliasi</h2>
+      <p>
+        التحول الرقمي الموثوق لرحلات العمرة وإدارة شبكات التسويق بالعمولة في جمهورية إندونيسيا
+        <br>
+        <strong>Kemitraan Mandiri Tanpa Modal • Bebas Waktu & Lokasi • Transparansi 100%</strong>
+      </p>
+
+      <div class="meta-grid">
+        <div class="meta-box">
+          <span class="meta-label">الترخيص الرسمي الحكومي</span>
+          <span class="meta-val">PPIU No. U-271/2021</span>
+        </div>
+        <div class="meta-box">
+          <span class="meta-label">المقر الإقليمي</span>
+          <span class="meta-val">بوغور - إندونيسيا</span>
+        </div>
+        <div class="meta-box">
+          <span class="meta-label">التكييف النظامي</span>
+          <span class="meta-val">KUHPerdata 1320</span>
+        </div>
+        <div class="meta-box">
+          <span class="meta-label">تاريخ الإصدار</span>
+          <span class="meta-val">أكتوبر 2026</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PAGE 2: VISION & EXECUTIVE SUMMARY ================= -->
+  <div class="page">
+    <div class="section-header">
+      <div class="section-icon">🎯</div>
+      <div>
+        <div class="section-title">الملخص التنفيذي والرؤية الاستراتيجية للمنصة</div>
+        <div class="section-sub">Ringkasan Eksekutif, Visi Transformasi & Nilai Strategis</div>
+      </div>
+    </div>
+
+    <div class="bilingual-grid">
+      <div class="col-card ar">
+        <div class="col-title">🇸🇦 الرؤية والأهداف الاستراتيجية</div>
+        <p>
+          تأسست منصة <strong>عمر بن الخطاب للعمرة (UBK)</strong> كحل رقمي رائد يربط الحرمين الشريفين بالسوق الإندونيسي (أكبر سوق إسلامي للعمرة عالمياً).
+        </p>
+        <p style="margin-top: 8px;">
+          يهدف المشروع إلى تحقيق <strong>حوكمة مالية وإدارية كاملة</strong> لعمليات حجز وتسيير رحلات العمرة، مع بناء أكبر شبكة تسويق بالعمولة لا مركزية تعتمد على تمكين الشباب والمسوقين في كل مدن وقرى إندونيسيا دون الحاجة لرأس مال أو التزام بدوام رسمي.
+        </p>
+        <p style="margin-top: 8px; font-weight: bold; color: #047857;">
+          النتيجة: تسريع وتيرة المبيعات، حماية سمعة المؤسسة، وقطع دابر الوسطاء العشوائيين.
+        </p>
+      </div>
+
+      <div class="col-card id">
+        <div class="col-title">🇮🇩 Visi & Misi Strategis Perusahaan</div>
+        <p>
+          Platform <strong>Umar Bin Alkhattab for Umrah (UBK)</strong> dikembangkan sebagai ekosistem digital terpadu untuk menjembatani jamaah Indonesia dengan layanan ibadah terbaik di Tanah Suci.
+        </p>
+        <p style="margin-top: 8px;">
+          Menghadirkan transparansi penuh, kepatuhan regulasi Kementerian Agama RI (Kemenag 5 Pasti Umrah), serta memberdayakan ekonomi umat melalui sistem <strong>Kemitraan Mandiri (Freelance Affiliate)</strong> yang fleksibel tanpa modal kerja.
+        </p>
+        <p style="margin-top: 8px; font-weight: bold; color: #b45309;">
+          Hasil: Ekspansi pasar masif, efisiensi operasional 60%, dan transaksi aman 100%.
+        </p>
+      </div>
+    </div>
+
+    <!-- Problems & Solutions 1 & 2 -->
+    <div class="problem-grid">
+      <div class="problem-box">
+        <div class="problem-title">❌ تحدي 1: استلام الأموال باليد والاحتيال</div>
+        <div class="problem-desc">
+          في النمط التقليدي، يجمع المسوقون أموال المعتمرين في حساباتهم الشخصية، مما يعرض المعتمر والشركة لمخاطر النصب والمساءلة القانونية.
+        </div>
+        <div class="solution-title">✅ حل UBK المعتمد</div>
+        <div class="problem-desc">
+          <strong>حظر الكاش نهائياً:</strong> كافة التحويلات البنكية تتم حصراً إلى الحساب الرسمي للشركة، وتُدقق إلكترونياً مع إرفاق إيصال التحويل.
+        </div>
+      </div>
+
+      <div class="problem-box">
+        <div class="problem-title">❌ تحدي 2: تسرب العملاء وضياع تعب المسوق</div>
+        <div class="problem-desc">
+          عند توجيه العميل لموقع الشركة العام، يتواصل مع أرقام الإدارة مباشرة ويفقد المسوق عمولته، مما يثبط عزيمة المسوقين.
+        </div>
+        <div class="solution-title">✅ حل UBK المعتمد</div>
+        <div class="problem-desc">
+          <strong>صفحة شخصية مستقلة (/m/code):</strong> لكل مسوق رابط حصري وصفحة خاصة به خالية من أي روابط خارجية، وتوجه واتساب إليه فقط.
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>منظومة عمر بن الخطاب للعمرة (UBK) • الملف التعريفي للإدارة</span>
+      <span>صفحة 2 من 4</span>
+    </div>
+  </div>
+
+  <!-- ================= PAGE 3: PLATFORM ARCHITECTURE ================= -->
+  <div class="page">
+    <div class="section-header">
+      <div class="section-icon">💻</div>
+      <div>
+        <div class="section-title">أقسام الموقع وهيكلة الأنظمة التفاعلية</div>
+        <div class="section-sub">Arsitektur Fitur & Modul Platform Digital UBK</div>
+      </div>
+    </div>
+
+    <!-- Module 1 -->
+    <div class="arch-card">
+      <div class="arch-header">
+        <span class="arch-name">1️⃣ البوابة الرئيسية الرسمية للمعتمرين</span>
+        <span class="arch-route">/ (Homepage)</span>
+      </div>
+      <ul class="arch-features">
+        <li><strong>معرض الباقات التفاعلي (Showcase Gallery):</strong> عرض الباقات بطريقة ألبوم الصور الفاخر مع خلفيات معالم الحرمين، وخيارات المقارنة الفورية.</li>
+        <li><strong>بيانات الفنادق 5 نجوم:</strong> تفاصيل واضحة لفنادق مكة المكرمة والمدينة المنورة، أسعار الغرف (رباعي/ثلاثي/ثنائي)، والدفعة المقدمة (DP).</li>
+        <li><strong>معرض المعتمرين المتحرك (Marquee Gallery):</strong> توثيق مصور لأفواج المعتمرين السابقة في الحرمين لتعزيز الثقة والمصداقية.</li>
+      </ul>
+    </div>
+
+    <!-- Module 2 -->
+    <div class="arch-card">
+      <div class="arch-header">
+        <span class="arch-name">2️⃣ صفحة جذب واستقطاب المسوقين</span>
+        <span class="arch-route">/mitra</span>
+      </div>
+      <ul class="arch-features">
+        <li><strong>شعار حرية العمل:</strong> التركيز على ميزة «دون الارتباط بأوقات عمل رسمية ومن أي مكان» (Work From Anywhere/Anytime).</li>
+        <li><strong>حاسبة أرباح تفاعلية:</strong> حساب العائد الفوري بالروبية الإندونيسية للمسوق وفريقه بمجرد تحريك المؤشر.</li>
+        <li><strong>نافذة الشروط النظامية (Terms Modal):</strong> اتفاقية ملزمة تخضع للقانون المدني الإندونيسي (KUHPerdata 1320) لحماية المؤسسة.</li>
+      </ul>
+    </div>
+
+    <!-- Module 3 -->
+    <div class="arch-card">
+      <div class="arch-header">
+        <span class="arch-name">3️⃣ لوحة تحكم المسوّق الرقمية والمحفظة المالية</span>
+        <span class="arch-route">/dashboard</span>
+      </div>
+      <ul class="arch-features">
+        <li><strong>محفظة مالية ذكية:</strong> رصيد العمولات المكتسبة، المبالغ المسحوبة، والرصيد المتاح للسحب مع سجل العمليات المفصل.</li>
+        <li><strong>شجرة المسوقين الفرعيين (Downline Team):</strong> متابعة أداء الفريق وجني عمولات الإشراف بنقرة واحدة.</li>
+        <li><strong>متجر البوسترات والتصاميم:</strong> إمكانية شراء تصاميم إعلانية احترافية جاهزة بخصم من رصيد العمولات مباشرة.</li>
+      </ul>
+    </div>
+
+    <!-- Module 4 -->
+    <div class="arch-card">
+      <div class="arch-header">
+        <span class="arch-name">4️⃣ لوحة الإدارة العليا والتدقيق المركزي</span>
+        <span class="arch-route">/admin</span>
+      </div>
+      <ul class="arch-features">
+        <li><strong>إدارة باقات العمرة ديناميكياً:</strong> إضافة وتعديل الفنادق والأسعار وتفعيل الباقات دون الحاجة لمبرمج.</li>
+        <li><strong>اعتماد المسوقين والصرف المالي:</strong> مراجعة طلبات السحب وتحويل العمولات وإرفاق الإيصال البنكي للمسوق.</li>
+        <li><strong>تصدير الحجوزات:</strong> تصدير كامل بيانات المعتمرين وجوازاتهم بضغطة زر بصيغة CSV لفرق العمليات والتأشيرات.</li>
+      </ul>
+    </div>
+
+    <div class="page-footer">
+      <span>منظومة عمر بن الخطاب للعمرة (UBK) • الملف التعريفي للإدارة</span>
+      <span>صفحة 3 من 4</span>
+    </div>
+  </div>
+
+  <!-- ================= PAGE 4: COMMISSIONS & LEGALITY ================= -->
+  <div class="page">
+    <div class="section-header">
+      <div class="section-icon">💰</div>
+      <div>
+        <div class="section-title">نموذج العمولات المالي والامتثال النظامي</div>
+        <div class="section-sub">Skema Komisi Finansial & Kepatuhan Hukum RI</div>
+      </div>
+    </div>
+
+    <div class="commission-grid">
+      <div class="comm-card direct">
+        <span style="font-size: 20pt;">👤</span>
+        <div style="font-weight: 800; font-size: 11pt; color: #064e3b; margin-top: 5px;">عمولة المسوّق المباشر</div>
+        <div class="comm-amount">Rp 500.000,-</div>
+        <div style="font-size: 8.5pt; color: #334155;">
+          عن كل معتمر يسجل ويؤكد حجزه بالدفعة المقدمة عبر رابط المسوق الحصري.
+        </div>
+      </div>
+
+      <div class="comm-card team">
+        <span style="font-size: 20pt;">👥</span>
+        <div style="font-weight: 800; font-size: 11pt; color: #92400e; margin-top: 5px;">مكافأة الإشراف وتطوير الفريق</div>
+        <div class="comm-amount">Rp 150.000,-</div>
+        <div style="font-size: 8.5pt; color: #334155;">
+          تُصرف للمسوّق الرئيسي كعائد إشرافي وقيادي عن كل معتمر يسجله فريقه الفرعي.
+        </div>
+      </div>
+    </div>
+
+    <!-- Legal Compliance 3-col -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 15px;">
+      <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; font-size: 8.5pt;">
+        <strong style="color: #064e3b; display: block; margin-bottom: 4px;">📜 KUHPerdata 1320</strong>
+        عقد شراكة تسويق حر ومستقل لا يُلزم الشركة برواتب أو تعويضات نهاية خدمة.
+      </div>
+      <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; font-size: 8.5pt;">
+        <strong style="color: #064e3b; display: block; margin-bottom: 4px;">🔒 UU PDP No. 27/2022</strong>
+        التزام تام بنظام حماية البيانات الشخصية الإندونيسي وتشفير وثائق المعتمرين.
+      </div>
+      <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; font-size: 8.5pt;">
+        <strong style="color: #064e3b; display: block; margin-bottom: 4px;">🕋 Kemenag 5 Pasti</strong>
+        التزام بمعايير وزارة الشؤون الدينية: تأكيد الترخيص، الرحلة، الفندق، التأشيرة، والسعر.
+      </div>
+    </div>
+
+    <!-- Conclusion Box -->
+    <div style="background: linear-gradient(135deg, #022c22, #0f172a); color: #ffffff; border-radius: 16px; padding: 20px; text-align: center; margin-top: 20px; border: 1px solid #d97706;">
+      <h3 style="color: #fbbf24; font-size: 13pt; margin-bottom: 6px;">خاتمة وتوصية استراتيجية للإدارة العليا</h3>
+      <p style="font-size: 9pt; color: #cbd5e1; line-height: 1.6; max-width: 600px; margin: 0 auto;">
+        تمثل منصة UBK النموذج الأمثل لنمو أعمال العمرة في إندونيسيا من خلال أتمتة المبيعات، ومضاعفة الانتشار عبر مئات المسوقين دون أعباء تشغيلية، وتأمين التدفقات النقدية بحساب الشركة الرسمي.
+      </p>
+      <div style="margin-top: 12px; font-size: 8.5pt; color: #94a3b8;">
+        الموقع الرسمي: <strong>ubk-umrah.vercel.app</strong> • هاتف الإدارة: <strong>+62 851-1053-9752</strong> • فرع بوغور، إندونيسيا
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>منظومة عمر بن الخطاب للعمرة (UBK) • كافة الحقوق محفوظة © 2026</span>
+      <span>صفحة 4 من 4</span>
+    </div>
+  </div>
+
+</body>
+</html>

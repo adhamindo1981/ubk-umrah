@@ -349,7 +349,11 @@ export function HomePageView() {
             </div>
 
             {/* Quick Navigation Links */}
-            <div className="flex items-center gap-4 text-[11px] text-slate-500">
+            <div className="flex flex-wrap items-center gap-3 md:gap-4 text-[11px] text-slate-500">
+              <Link href="/deck" target="_blank" className="hover:text-amber-400 transition text-emerald-400/90 font-medium">
+                {isArabic ? "📄 الملف التعريفي والتقرير التنفيذي (Deck & PDF)" : "📄 Executive Deck & Profile (PDF)"}
+              </Link>
+              <span>•</span>
               <Link href="/auth/signin" className="hover:text-amber-400 transition">
                 {isArabic ? "بوابة المسوقين" : "Portal Mitra"}
               </Link>

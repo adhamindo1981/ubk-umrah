@@ -85,6 +85,14 @@ export function AdminPageView({
               <span>📊</span>
               <span>{t("adminExportCsv")}</span>
             </a>
+            <Link
+              href="/deck"
+              target="_blank"
+              className="bg-gradient-to-r from-amber-500/20 to-emerald-500/20 hover:from-amber-500/30 hover:to-emerald-500/30 text-amber-300 border border-amber-500/40 font-bold text-xs px-3 py-1.5 rounded-xl transition shadow-xs inline-flex items-center gap-1.5 shrink-0"
+            >
+              <span>📑</span>
+              <span>{isArabic ? "ملف الإدارة (PDF / عرض)" : "Profil Eksekutif (PDF)"}</span>
+            </Link>
             <Link href="/dashboard" className="text-slate-400 hover:text-white text-xs transition px-2.5 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700 sm:hidden shrink-0">
               {t("goToDashboard")}
             </Link>
