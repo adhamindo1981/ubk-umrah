@@ -52,8 +52,20 @@ export async function PATCH(request: Request) {
     }
 
     let shouldAwardReward = false;
+    let shouldRevokeReward = false;
+
     if (status === "COMPLETED" && existingOrder.marketerId && !existingOrder.rewardAwarded) {
       shouldAwardReward = true;
+    } else if (status !== "COMPLETED" && existingOrder.rewardAwarded) {
+      // If order was previously completed and now changed to CANCELED/PENDING/IN_PROGRESS, revoke rewards
+      shouldRevokeReward = true;
+    }
+
+    if (shouldRevokeReward) {
+      // Revoke and delete rewards awarded to both direct marketer and parent marketer
+      await prisma.reward.deleteMany({
+        where: { orderId: existingOrder.id },
+      });
     }
 
     // 2. Update order status in DB
@@ -61,7 +73,7 @@ export async function PATCH(request: Request) {
       where: { id: Number(orderId) },
       data: {
         status,
-        ...(shouldAwardReward ? { rewardAwarded: true } : {}),
+        rewardAwarded: shouldAwardReward ? true : shouldRevokeReward ? false : existingOrder.rewardAwarded,
       },
       include: { client: true, marketer: true },
     });
@@ -177,3 +189,107 @@ export async function PATCH(request: Request) {
     );
   }
 }
+
+/**
+ * DELETE endpoint for Admin to delete a pilgrim booking/order.
+ * - Deletes the Order.
+ * - Automatically deletes and revokes all Reward records linked to this order
+ *   (both for direct marketer and parent/sponsor marketer).
+ * - Cleans up the client record if they have no other bookings.
+ */
+export async function DELETE(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user || (session.user as any).role !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Tidak diizinkan / غير مصرح لك كمسؤول" },
+        { status: 401 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const orderIdParam = searchParams.get("orderId");
+
+    let orderId: number | null = orderIdParam ? Number(orderIdParam) : null;
+    if (!orderId) {
+      try {
+        const body = await request.json();
+        orderId = body.orderId ? Number(body.orderId) : null;
+      } catch (_) {}
+    }
+
+    if (!orderId || isNaN(orderId)) {
+      return NextResponse.json(
+        { error: "ID Pesanan tidak valid / معرف الطلب غير صالح" },
+        { status: 400 }
+      );
+    }
+
+    // 1. Fetch existing order with relations
+    const existingOrder = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        client: true,
+        marketer: {
+          include: {
+            parent: true,
+          },
+        },
+      },
+    });
+
+    if (!existingOrder) {
+      return NextResponse.json(
+        { error: "Pesanan tidak ditemukan / الحجز غير موجود" },
+        { status: 404 }
+      );
+    }
+
+    // 2. Delete and revoke all Reward records associated with this order
+    // This revokes the direct marketer commission and the sponsor/parent marketer's team commission
+    const deletedRewards = await prisma.reward.deleteMany({
+      where: { orderId: orderId },
+    });
+
+    // 3. Delete the Order record
+    await prisma.order.delete({
+      where: { id: orderId },
+    });
+
+    // 4. Clean up client record if no other orders exist for this client
+    let clientCleanedUp = false;
+    const remainingClientOrders = await prisma.order.count({
+      where: { clientId: existingOrder.clientId },
+    });
+
+    if (remainingClientOrders === 0) {
+      try {
+        await prisma.client.delete({
+          where: { id: existingOrder.clientId },
+        });
+        clientCleanedUp = true;
+      } catch (clientErr) {
+        console.warn("Client cleanup notice:", clientErr);
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Pesanan berhasil dihapus dan seluruh komisi terkait telah dibatalkan",
+      deletedOrderId: orderId,
+      revokedRewardsCount: deletedRewards.count,
+      clientName: existingOrder.client?.name,
+      marketerName: existingOrder.marketer?.username || null,
+      parentMarketerName: existingOrder.marketer?.parent?.username || null,
+      clientCleanedUp,
+    });
+  } catch (error: any) {
+    console.error("Failed to delete order:", error);
+    return NextResponse.json(
+      { error: "Gagal menghapus pesanan / حدث خطأ أثناء حذف الحجز" },
+      { status: 500 }
+    );
+  }
+}
+

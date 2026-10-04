@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface OrderStatusSelectorProps {
   orderId: number;
@@ -11,6 +12,7 @@ export function OrderStatusSelector({
   orderId,
   initialStatus,
 }: OrderStatusSelectorProps) {
+  const router = useRouter();
   const [status, setStatus] = useState(initialStatus);
   const [loading, setLoading] = useState(false);
 
@@ -25,6 +27,7 @@ export function OrderStatusSelector({
 
       if (res.ok) {
         setStatus(newStatus);
+        router.refresh();
       } else {
         alert("فشل تحديث الحالة");
       }

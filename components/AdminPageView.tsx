@@ -14,6 +14,7 @@ import { AdminPosterManagementModal } from "@/components/AdminPosterManagementMo
 import { AdminPackagesManagementModal } from "@/components/AdminPackagesManagementModal";
 import { AdminGalleryManagementModal } from "@/components/AdminGalleryManagementModal";
 import { AdminUserManagementModal } from "@/components/AdminUserManagementModal";
+import { AdminDeleteOrderModal } from "@/components/AdminDeleteOrderModal";
 import { UbkLogo } from "@/components/UbkLogo";
 import { LogoutButton } from "@/components/LogoutButton";
 import Link from "next/link";
@@ -427,6 +428,7 @@ export function AdminPageView({
                     <th className="px-6 py-3.5">{t("colPartnerCode")}</th>
                     <th className="px-6 py-3.5">{isArabic ? "تحديث الحالة" : "Perbarui Status"}</th>
                     <th className="px-6 py-3.5">{t("colDate")}</th>
+                    <th className="px-6 py-3.5 text-center">{isArabic ? "الإجراءات" : "Aksi"}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -446,6 +448,18 @@ export function AdminPageView({
                       </td>
                       <td className="px-6 py-4 text-slate-400 text-xs">
                         {new Date(o.createdAt).toLocaleDateString(isArabic ? "ar-SA" : "id-ID")}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <AdminDeleteOrderModal
+                          orderId={o.id}
+                          clientName={o.client.name}
+                          clientEmail={o.client.email}
+                          clientPhone={o.client.phone}
+                          marketerName={o.marketer?.username}
+                          parentMarketerName={o.marketer?.parent?.username}
+                          status={o.status}
+                          rewardAwarded={o.rewardAwarded}
+                        />
                       </td>
                     </tr>
                   ))}
