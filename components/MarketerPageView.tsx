@@ -38,10 +38,13 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
   const [selectedPackage, setSelectedPackage] = useState<string>("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Lock this marketer's referral attribution in browser storage and cookies
+  // Lock this marketer's referral attribution in browser storage and cookies (only for external visitors/pilgrims, not logged-in Admins)
   useEffect(() => {
     if (typeof window !== "undefined" && marketer.referralCode) {
       try {
+        const hasSession = document.cookie.includes("session-token");
+        if (hasSession) return;
+
         localStorage.setItem("ubk_pilgrim_marketer", marketer.referralCode);
         document.cookie = `ubk_pilgrim_marketer=${marketer.referralCode}; path=/; max-age=31536000; SameSite=Lax`;
       } catch (_) {}

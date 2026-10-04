@@ -21,9 +21,13 @@ export function HomePageView() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // If visitor previously opened a marketer's link, automatically redirect to marketer page
+  // (Exempts logged-in Admins/Marketers so they can freely browse the homepage)
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
+        const hasSession = document.cookie.includes("session-token");
+        if (hasSession) return;
+
         const savedCode = localStorage.getItem("ubk_pilgrim_marketer");
         if (savedCode && savedCode.trim() !== "") {
           window.location.replace(`/m/${savedCode.trim()}`);

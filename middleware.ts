@@ -1,14 +1,25 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
+
+const secret = process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || "ubk-umrah-secret-production-auth-key-2026";
 
 /**
  * Next.js Edge Middleware for Strict Marketer Attribution & Isolation.
- * 1. When a pilgrim visits a marketer's page (/m/:code), it sets a persistent 1-year cookie (`ubk_pilgrim_marketer`).
- * 2. If that pilgrim later attempts to access the root homepage ("/"), the middleware automatically intercepts and
- *    redirects them back to their designated marketer's page (/m/:code), preventing bypass of the marketer.
+ * - Pilgrims / External Visitors: Locked to their marketer and auto-redirected to /m/:code.
+ * - Admins & Marketers (Internal Team): 100% UNRESTRICTED. Can freely inspect any marketer page and visit the main homepage.
  */
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Check if current user is logged in (Admin or Marketer)
+  const token = await getToken({ req: request, secret });
+  const isInternalUser = token?.role === "ADMIN" || token?.role === "MARKETER";
+
+  // Admins and Marketers have full unrestricted access to everything
+  if (isInternalUser) {
+    return NextResponse.next();
+  }
 
   // 1. Marketer Marketing Page: /m/[code]
   const marketerMatch = pathname.match(/^\/m\/([A-Za-z0-9_-]+)/);
