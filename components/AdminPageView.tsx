@@ -13,6 +13,7 @@ import { OrderStatusSelector } from "@/app/admin/OrderStatusSelector";
 import { AdminPosterManagementModal } from "@/components/AdminPosterManagementModal";
 import { AdminPackagesManagementModal } from "@/components/AdminPackagesManagementModal";
 import { AdminGalleryManagementModal } from "@/components/AdminGalleryManagementModal";
+import { AdminUserManagementModal } from "@/components/AdminUserManagementModal";
 import { UbkLogo } from "@/components/UbkLogo";
 import { LogoutButton } from "@/components/LogoutButton";
 import Link from "next/link";
@@ -66,6 +67,9 @@ export function AdminPageView({
 
           {/* Quick Actions Scroll Bar on Mobile & Desktop */}
           <div className="flex items-center gap-2 overflow-x-auto pt-2.5 pb-0.5 border-t border-slate-800/80 mt-2 text-xs">
+            <div className="shrink-0">
+              <AdminUserManagementModal marketers={marketers} />
+            </div>
             <div className="shrink-0">
               <AdminPackagesManagementModal />
             </div>
@@ -237,6 +241,7 @@ export function AdminPageView({
                   {pendingApprovalsCount} {isArabic ? "حساب بانتظار التفعيل" : "Akun Baru Menunggu Aktivasi"}
                 </span>
               )}
+              <AdminUserManagementModal marketers={marketers} />
               <InviteMarketerModal isAdmin={true} />
             </div>
           </div>
