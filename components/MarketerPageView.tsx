@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { MarketerBookingForm } from "@/app/m/[code]/MarketerBookingForm";
@@ -37,6 +37,16 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
   const [activeZoomPoster, setActiveZoomPoster] = useState<FeaturedPoster | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<string>("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Lock this marketer's referral attribution in browser storage and cookies
+  useEffect(() => {
+    if (typeof window !== "undefined" && marketer.referralCode) {
+      try {
+        localStorage.setItem("ubk_pilgrim_marketer", marketer.referralCode);
+        document.cookie = `ubk_pilgrim_marketer=${marketer.referralCode}; path=/; max-age=31536000; SameSite=Lax`;
+      } catch (_) {}
+    }
+  }, [marketer.referralCode]);
 
   // Format WhatsApp Link for Consultant
   const rawPhone = marketer.whatsapp || "6281234567890";

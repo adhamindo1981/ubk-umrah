@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/LanguageContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -19,6 +19,18 @@ export function HomePageView() {
   const { t, isArabic } = useLanguage();
   const [selectedPackage, setSelectedPackage] = useState<string>("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // If visitor previously opened a marketer's link, automatically redirect to marketer page
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const savedCode = localStorage.getItem("ubk_pilgrim_marketer");
+        if (savedCode && savedCode.trim() !== "") {
+          window.location.replace(`/m/${savedCode.trim()}`);
+        }
+      } catch (_) {}
+    }
+  }, []);
   const homeWaText = encodeURIComponent(
     `Assalamu'alaikum UBK Umrah, saya ingin konsultasi mengenai program dan paket perjalanan ibadah Umrah.\n\n----------------------------------------\n\nالسلام عليكم، أود الاستفسار عن باقات وبرامج رحلات العمرة لدى UBK.`
   );
