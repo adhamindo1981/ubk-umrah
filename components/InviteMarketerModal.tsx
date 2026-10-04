@@ -3,6 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useRouter } from "next/navigation";
+import { getPublicBaseUrl } from "@/lib/urlUtils";
 
 interface InviteMarketerModalProps {
   isAdmin?: boolean;
@@ -55,7 +56,12 @@ export function InviteMarketerModal({ isAdmin = false }: InviteMarketerModalProp
       setLoading(false);
 
       if (res.ok && data.marketer) {
-        setCreatedInfo(data.marketer);
+        const cleanBase = getPublicBaseUrl(typeof window !== "undefined" ? window.location.origin : undefined);
+        setCreatedInfo({
+          ...data.marketer,
+          loginUrl: `${cleanBase}/auth/signin`,
+          personalPageUrl: `${cleanBase}/m/${data.marketer.referralCode}`,
+        });
       } else {
         setError(data.error || (isArabic ? "فشل إنشاء حساب المسوق." : "Gagal membuat akun mitra."));
       }

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { generateQRCodeDataUrl } from "@/lib/referral";
+import { getPublicBaseUrl } from "@/lib/urlUtils";
 import { DashboardPageView } from "@/components/DashboardPageView";
 
 export default async function DashboardPage() {
@@ -54,17 +55,19 @@ export default async function DashboardPage() {
 
   const availableIDR = Math.max(0, totalEarnedIDR - totalRedeemedIDR - totalPosterPurchasesIDR);
 
-  // Dynamically resolve base URL from request headers or environment
+  // Dynamically resolve official public base URL
   const headersList = headers();
   const rawHost =
     headersList.get("x-forwarded-host") ||
     headersList.get("host") ||
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
     process.env.VERCEL_URL ||
     "ubk-umrah.vercel.app";
   const proto =
     headersList.get("x-forwarded-proto") ||
     (rawHost.includes("localhost") ? "http" : "https");
-  const baseUrl = rawHost.startsWith("http") ? rawHost : `${proto}://${rawHost}`;
+  const rawUrl = rawHost.startsWith("http") ? rawHost : `${proto}://${rawHost}`;
+  const baseUrl = getPublicBaseUrl(rawUrl);
 
   // Personal page and share link
   const personalPageUrl = user.referralCode ? `${baseUrl}/m/${user.referralCode}` : "";

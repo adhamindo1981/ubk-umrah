@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { hashPassword } from "@/lib/auth";
 import { generateShortReferralCode } from "@/lib/referral";
+import { getPublicBaseUrl } from "@/lib/urlUtils";
 
 
 
@@ -91,9 +92,10 @@ export async function POST(request: Request) {
       },
     });
 
-    const origin = request.headers.get("origin") || "http://localhost:3000";
-    const personalPageUrl = `${origin}/m/${referralCode}`;
-    const loginUrl = `${origin}/auth/signin`;
+    const rawOrigin = request.headers.get("origin") || request.headers.get("host") || undefined;
+    const baseUrl = getPublicBaseUrl(rawOrigin);
+    const personalPageUrl = `${baseUrl}/m/${referralCode}`;
+    const loginUrl = `${baseUrl}/auth/signin`;
 
     return NextResponse.json({
       success: true,

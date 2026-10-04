@@ -11,6 +11,7 @@ import { PosterMarketplaceModal } from "@/components/PosterMarketplaceModal";
 import { MarketerActions } from "@/app/dashboard/MarketerActions";
 import { UbkLogo } from "@/components/UbkLogo";
 import { LogoutButton } from "@/components/LogoutButton";
+import { getPublicBaseUrl } from "@/lib/urlUtils";
 import Link from "next/link";
 
 export interface DashboardPageViewProps {
@@ -83,8 +84,8 @@ export function DashboardPageView({
 
   useEffect(() => {
     if (typeof window !== "undefined" && user.referralCode) {
-      const origin = window.location.origin;
-      const clientUrl = `${origin}/m/${user.referralCode}`;
+      const cleanOrigin = getPublicBaseUrl(window.location.origin);
+      const clientUrl = `${cleanOrigin}/m/${user.referralCode}`;
       setActiveUrl(clientUrl);
       const text = encodeURIComponent(
         `Assalamu'alaikum wr. wb.,\nDaftarkan ibadah Umrah Anda bersama UBK Umrah (Umar Bin Alkhattab for Umrah) melalui halaman resmi kemitraan saya:\n${clientUrl}\n\n----------------------------------------\n\nالسلام عليكم ورحمة الله وبركاته،\nيمكنكم الاطلاع على تفاصيل برامج العمرة وطلب الحجز المباشر عبر صفحتي المعتمدة لدى عمر بن الخطاب للعمرة (UBK):\n${clientUrl}`
