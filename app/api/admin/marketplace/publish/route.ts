@@ -18,7 +18,16 @@ function createWatermarkedSvgWrapper(
 ): { cleanSvg: string; previewSvg: string } {
   // Use exact pixel dimensions of the uploaded artwork
   let artworkWidth = imageWidth && imageWidth > 200 ? imageWidth : 1080;
-  let artworkHeight = imageHeight && imageHeight > 200 ? imageHeight : (category === "INSTAGRAM_STORY" ? 1920 : 1350);
+  let artworkHeight =
+    imageHeight && imageHeight > 200
+      ? imageHeight
+      : category === "INSTAGRAM_STORY"
+      ? 1920
+      : category === "BANNER"
+      ? 608
+      : category === "ORIGINAL_SIZE"
+      ? 1350
+      : 1080;
 
   // Ensure standard scale if width is smaller
   if (artworkWidth < 600) {

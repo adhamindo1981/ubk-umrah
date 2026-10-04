@@ -136,7 +136,7 @@ export function AdminPosterManagementModal() {
           setImageHeight(naturalH);
         }
 
-        const maxDim = 1200;
+        const maxDim = 1920;
         let width = img.width;
         let height = img.height;
 
@@ -343,7 +343,16 @@ export function AdminPosterManagementModal() {
                               </div>
                             </td>
                             <td className="px-4 py-3.5 font-medium text-slate-800 max-w-xs">
-                              {o.template.title}
+                              <div className="font-semibold text-slate-900">{o.template.title}</div>
+                              <span className="inline-block mt-0.5 text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded font-medium">
+                                {o.template.category === "ORIGINAL_SIZE"
+                                  ? (isArabic ? "الحجم الأصلي للتصميم" : "Ukuran Asli")
+                                  : o.template.category === "INSTAGRAM_STORY"
+                                  ? "Story (9:16)"
+                                  : o.template.category === "BANNER"
+                                  ? "Banner (16:9)"
+                                  : "Feed (1:1)"}
+                              </span>
                             </td>
                             <td className="px-4 py-3.5">
                               <span
@@ -506,6 +515,13 @@ export function AdminPosterManagementModal() {
                           />
                           <div className="text-xs space-y-1 flex-1">
                             <strong className="text-slate-900 block">{isArabic ? "تم اختيار صورة التصميم بنجاح" : "File desain siap diterbitkan"}</strong>
+                            {imageWidth && imageHeight ? (
+                              <div className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-md font-mono font-bold text-[11px]">
+                                <span>📐</span>
+                                <span>{isArabic ? "أبعاد التصميم الأصلي:" : "Ukuran Asli:"}</span>
+                                <span>{imageWidth} × {imageHeight} px</span>
+                              </div>
+                            ) : null}
                             <p className="text-slate-500 text-[11px]">
                               {isArabic
                                 ? "سيقوم النظام بحفظ التصميم كأصل عالي الدقة وإضافة شريط باركود المسوق ورقم واتسابه في الأسفل تلقائياً."
@@ -611,7 +627,19 @@ export function AdminPosterManagementModal() {
                         <option value="INSTAGRAM_FEED">Instagram Feed (1:1 Square)</option>
                         <option value="INSTAGRAM_STORY">Instagram Story / WA Status (9:16)</option>
                         <option value="BANNER">Website Banner (16:9)</option>
+                        <option value="ORIGINAL_SIZE">
+                          {isArabic
+                            ? "رفع الصورة بالحجم الأصلي كما هو مصمم"
+                            : "Ukuran Asli Desain (Original Size)"}
+                        </option>
                       </select>
+                      {category === "ORIGINAL_SIZE" && (
+                        <p className="text-[11px] text-emerald-700 mt-1 font-medium">
+                          {isArabic
+                            ? "✓ سيتم الاحتفاظ بنسبة وأبعاد التصميم الأصلية بدقة 100% دون أي اقتصاص أو تغيير للمقاس."
+                            : "✓ Dimensi dan rasio desain asli dipertahankan 100% tanpa pemotongan."}
+                        </p>
+                      )}
                     </div>
 
                     {publishMode === "studio" && (
