@@ -17,6 +17,7 @@ import { TabunganCalculatorModal } from "@/components/TabunganCalculatorModal";
 import { RadarRouletteModal } from "@/components/RadarRouletteModal";
 import { MiniCrmView } from "@/components/MiniCrmView";
 import { SalesEngineHub } from "@/components/marketer/SalesEngineHub";
+import { isAiStudioEnabled } from "@/lib/ai-studio/flags";
 import Link from "next/link";
 
 export interface DashboardPageViewProps {
@@ -183,6 +184,19 @@ export function DashboardPageView({
 
           {/* Quick Actions Bar (Horizontal Scrollable on Mobile) */}
           <div className="flex items-center gap-2 overflow-x-auto pt-2.5 pb-0.5 border-t border-slate-100 mt-2 text-xs">
+            {isAiStudioEnabled() && (
+              <Link
+                href="/dashboard/ai-studio"
+                className="shrink-0 text-xs font-black text-slate-950 bg-gradient-to-r from-amber-400 via-amber-300 to-emerald-400 hover:from-amber-300 hover:to-emerald-300 border border-amber-500/30 px-3.5 py-1.5 rounded-xl transition inline-flex items-center gap-1.5 shadow-sm active:scale-95 animate-pulse"
+              >
+                <span>✨</span>
+                <span>{isArabic ? "استوديو الذكاء الاصطناعي" : "AI Marketing Studio"}</span>
+                <span className="text-[10px] bg-slate-950 text-amber-300 font-bold px-1.5 py-0.2 rounded-md">
+                  NEW
+                </span>
+              </Link>
+            )}
+
             {user.referralCode && (
               <Link
                 href={`/m/${user.referralCode}`}

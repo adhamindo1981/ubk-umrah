@@ -3,13 +3,9 @@
  * Defaults to true unless explicitly disabled via NEXT_PUBLIC_ENABLE_AI_STUDIO="false".
  */
 export function isAiStudioEnabled(): boolean {
-  if (typeof process !== "undefined" && process.env) {
-    const flag =
-      process.env.NEXT_PUBLIC_ENABLE_AI_STUDIO ||
-      process.env.ENABLE_AI_STUDIO;
-    if (flag === "false" || flag === "0") {
-      return false;
-    }
+  // If explicitly set to "false" or "0", disable it. Otherwise it is enabled by default.
+  if (process.env.NEXT_PUBLIC_ENABLE_AI_STUDIO === "false" || process.env.NEXT_PUBLIC_ENABLE_AI_STUDIO === "0") {
+    return false;
   }
   return true;
 }

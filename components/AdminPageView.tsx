@@ -17,6 +17,7 @@ import { AdminUserManagementModal } from "@/components/AdminUserManagementModal"
 import { AdminDeleteOrderModal } from "@/components/AdminDeleteOrderModal";
 import { UbkLogo } from "@/components/UbkLogo";
 import { LogoutButton } from "@/components/LogoutButton";
+import { isAiStudioEnabled } from "@/lib/ai-studio/flags";
 import Link from "next/link";
 
 export interface AdminPageViewProps {
@@ -68,6 +69,15 @@ export function AdminPageView({
 
           {/* Quick Actions Scroll Bar on Mobile & Desktop */}
           <div className="flex items-center gap-2 overflow-x-auto pt-2.5 pb-0.5 border-t border-slate-800/80 mt-2 text-xs">
+            {isAiStudioEnabled() && (
+              <Link
+                href="/dashboard/ai-studio"
+                className="shrink-0 text-xs font-black text-slate-950 bg-gradient-to-r from-amber-400 via-amber-300 to-emerald-400 hover:from-amber-300 hover:to-emerald-300 px-3 py-1.5 rounded-xl transition inline-flex items-center gap-1.5 shadow-sm active:scale-95 animate-pulse"
+              >
+                <span>✨</span>
+                <span>{isArabic ? "استوديو الذكاء الاصطناعي" : "AI Marketing Studio"}</span>
+              </Link>
+            )}
             <div className="shrink-0">
               <AdminUserManagementModal marketers={marketers} />
             </div>
