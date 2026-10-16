@@ -15,7 +15,7 @@ export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
   },
-  debug: true,
+  debug: process.env.NODE_ENV === "development",
   secret: process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || "ubk-umrah-secret-production-auth-key-2026",
   providers: [
     CredentialsProvider({

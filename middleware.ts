@@ -5,23 +5,43 @@ import { getToken } from "next-auth/jwt";
 const secret = process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || "ubk-umrah-secret-production-auth-key-2026";
 
 /**
- * Next.js Edge Middleware for Strict Marketer Attribution & Isolation.
- * - Pilgrims / External Visitors: Locked to their marketer and auto-redirected to /m/:code.
- * - Admins & Marketers (Internal Team): 100% UNRESTRICTED. Can freely inspect any marketer page and visit the main homepage.
+ * Next.js Edge Middleware for:
+ * 1. Strict Role-Based Access Control (RBAC) at Edge for /admin and /dashboard
+ * 2. Marketer Attribution & Isolation for Pilgrims
  */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Check if current user is logged in (Admin or Marketer)
+  // Check if current user is logged in
   const token = await getToken({ req: request, secret });
-  const isInternalUser = token?.role === "ADMIN" || token?.role === "MARKETER";
 
-  // Admins and Marketers have full unrestricted access to everything
+  // 1. Edge Protection for /admin: Strictly ADMIN role only
+  if (pathname.startsWith("/admin")) {
+    if (!token || token.role !== "ADMIN") {
+      const loginUrl = new URL("/auth/signin", request.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    return NextResponse.next();
+  }
+
+  // 2. Edge Protection for /dashboard: Strictly authenticated users only
+  if (pathname.startsWith("/dashboard")) {
+    if (!token) {
+      const loginUrl = new URL("/auth/signin", request.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    return NextResponse.next();
+  }
+
+  // Admins and Marketers have full unrestricted access to browse the rest of the site
+  const isInternalUser = token?.role === "ADMIN" || token?.role === "MARKETER";
   if (isInternalUser) {
     return NextResponse.next();
   }
 
-  // 1. Marketer Marketing Page: /m/[code]
+  // 3. Marketer Marketing Page: /m/[code]
   const marketerMatch = pathname.match(/^\/m\/([A-Za-z0-9_-]+)/);
   if (marketerMatch) {
     const code = marketerMatch[1];
@@ -38,7 +58,7 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // 2. Marketer Recruitment Page with ref: /mitra?ref=CODE
+  // 4. Marketer Recruitment Page with ref: /mitra?ref=CODE
   if (pathname === "/mitra") {
     const ref = request.nextUrl.searchParams.get("ref");
     if (ref && ref.trim() !== "") {
@@ -53,7 +73,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 3. Main Landing Homepage: "/"
+  // 5. Main Landing Homepage: "/"
   if (pathname === "/") {
     const savedMarketerCode = request.cookies.get("ubk_pilgrim_marketer")?.value;
     // If the visitor was previously introduced by a marketer, lock and bounce them to their marketer's page!

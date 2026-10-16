@@ -20,8 +20,8 @@ export async function PATCH(request: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "Tidak diizinkan / غير مصرح" }, { status: 401 });
+    if (!session || !session.user || (session.user as any).role !== "ADMIN") {
+      return NextResponse.json({ error: "Tidak diizinkan / غير مصرح لك كمسؤول" }, { status: 403 });
     }
 
     const body = await request.json();

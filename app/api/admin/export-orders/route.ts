@@ -14,8 +14,8 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "غير مصرح" }, { status: 401 });
+    if (!session || !session.user || (session.user as any).role !== "ADMIN") {
+      return NextResponse.json({ error: "غير مصرح لك كمسؤول / Tidak diizinkan" }, { status: 403 });
     }
 
     const orders = await prisma.order.findMany({

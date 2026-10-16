@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
-import { hashPassword } from "@/lib/auth";
-
-
+import { hashPassword, comparePassword } from "@/lib/auth";
 
 /**
  * PATCH endpoint to update marketer profile details:
- * whatsapp, bankName, bankAccountNumber, bankAccountName, idNumber, subMarketerShare, newPassword
+ * whatsapp, bankName, bankAccountNumber, bankAccountName, idNumber, subMarketerShare, currentPassword, newPassword
+ * SECURITY HARDENING:
+ * - Changing password strictly requires verification of currentPassword.
+ * - Minimum password length of 6 characters enforced.
  */
 export async function PATCH(request: Request) {
   try {
@@ -26,8 +27,17 @@ export async function PATCH(request: Request) {
       bankAccountName,
       idNumber,
       subMarketerShare,
+      currentPassword,
       newPassword,
     } = body;
+
+    const currentUser = await prisma.user.findUnique({
+      where: { id: marketerId },
+    });
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Pengguna tidak ditemukan" }, { status: 404 });
+    }
 
     const updateData: any = {};
     if (whatsapp !== undefined) updateData.whatsapp = whatsapp.trim();
@@ -43,7 +53,30 @@ export async function PATCH(request: Request) {
       }
     }
 
+    // Secure Password Change flow
     if (newPassword && newPassword.trim() !== "") {
+      if (newPassword.trim().length < 6) {
+        return NextResponse.json(
+          { error: "Kata sandi baru minimal 6 karakter / كلمة المرور الجديدة يجب ألا تقل عن 6 أحرف" },
+          { status: 400 }
+        );
+      }
+
+      if (!currentPassword) {
+        return NextResponse.json(
+          { error: "Kata sandi saat ini wajib diisi untuk mengubah kata sandi / يجب إدخال كلمة المرور الحالية" },
+          { status: 400 }
+        );
+      }
+
+      const isCurrentValid = await comparePassword(currentPassword, currentUser.passwordHash);
+      if (!isCurrentValid) {
+        return NextResponse.json(
+          { error: "Kata sandi saat ini salah / كلمة المرور الحالية غير صحيحة" },
+          { status: 400 }
+        );
+      }
+
       updateData.passwordHash = await hashPassword(newPassword.trim());
     }
 

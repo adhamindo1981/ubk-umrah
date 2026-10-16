@@ -14,9 +14,9 @@ export async function PATCH(request: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    // Ensure user is logged in
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "غير مصرح" }, { status: 401 });
+    // Ensure user is logged in as ADMIN
+    if (!session || !session.user || (session.user as any).role !== "ADMIN") {
+      return NextResponse.json({ error: "غير مصرح لك كمسؤول / Tidak diizinkan" }, { status: 403 });
     }
 
     const body = await request.json();
@@ -66,8 +66,8 @@ export async function DELETE(request: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "غير مصرح بالدخول" }, { status: 401 });
+    if (!session || !session.user || (session.user as any).role !== "ADMIN") {
+      return NextResponse.json({ error: "غير مصرح لك كمسؤول / Tidak diizinkan" }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);

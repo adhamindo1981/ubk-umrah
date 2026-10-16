@@ -3,16 +3,17 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
 import { generateShortReferralCode } from "@/lib/referral";
 
-
-
 /**
- * API route to register a new Marketer / User.
- * Accepts: { username, email, password, whatsapp?, parentReferralCode?, role? }
+ * API route to register a new Marketer / Partner.
+ * Accepts: { username, email, password, whatsapp?, parentReferralCode? }
+ * SECURITY HARDENING:
+ * - 'role' is strictly locked to 'MARKETER' to prevent arbitrary Admin escalation.
+ * - Minimum password length of 6 characters enforced.
  */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { username, email, password, whatsapp, parentReferralCode, role } = body;
+    const { username, email, password, whatsapp, parentReferralCode } = body;
 
     if (!username || !email || !password) {
       return NextResponse.json(
@@ -21,10 +22,17 @@ export async function POST(request: Request) {
       );
     }
 
+    if (password.length < 6) {
+      return NextResponse.json(
+        { error: "Kata sandi minimal 6 karakter / كلمة المرور يجب ألا تقل عن 6 أحرف" },
+        { status: 400 }
+      );
+    }
+
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({
       where: {
-        OR: [{ username }, { email }],
+        OR: [{ username: username.trim() }, { email: email.trim().toLowerCase() }],
       },
     });
 
@@ -57,7 +65,7 @@ export async function POST(request: Request) {
     // Hash the password
     const hashedPassword = await hashPassword(password);
 
-    // Create new user with short referralCode and optional parent link in Tree
+    // Create new marketer with STRICT 'MARKETER' role (Admin creation is restricted to /api/admin/admins)
     const user = await prisma.user.create({
       data: {
         username: username.trim(),
@@ -65,7 +73,8 @@ export async function POST(request: Request) {
         passwordHash: hashedPassword,
         whatsapp: whatsapp ? whatsapp.trim() : null,
         parentId: parentId,
-        role: role === "ADMIN" ? "ADMIN" : "MARKETER",
+        role: "MARKETER",
+        isApproved: false, // Requires admin verification
         referralCode: referralCode,
       },
     });

@@ -12,8 +12,8 @@ import { authOptions } from "@/lib/authOptions";
 export async function PATCH(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "غير مصرح" }, { status: 401 });
+    if (!session || !session.user || (session.user as any).role !== "ADMIN") {
+      return NextResponse.json({ error: "غير مصرح لك كمسؤول / Tidak diizinkan" }, { status: 403 });
     }
 
     const body = await request.json();
