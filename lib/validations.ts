@@ -176,3 +176,59 @@ export function validateBase64Image(base64String: string): {
     buffer,
   };
 }
+
+/**
+ * Lead Management (Mini-CRM & Tabungan Umrah) Schemas
+ */
+export const createLeadSchema = z.object({
+  clientName: z
+    .string()
+    .trim()
+    .min(2, "Nama prospek minimal 2 karakter")
+    .max(100, "Nama prospek maksimal 100 karakter"),
+  whatsappNumber: z
+    .string()
+    .trim()
+    .regex(PHONE_REGEX, "Nomor WhatsApp tidak valid (contoh: 0812... atau +62...)"),
+  source: z
+    .enum(["MANUAL_MISSION", "TABUNGAN_CALCULATOR", "RADAR_ROULETTE", "LANDING_PAGE"])
+    .optional()
+    .default("MANUAL_MISSION"),
+  status: z
+    .enum(["NEW", "CONTACTED", "INTERESTED", "DP_PAID", "CLOSED_WON"])
+    .optional()
+    .default("NEW"),
+  packageInterest: z
+    .string()
+    .trim()
+    .min(2, "Minat paket wajib diisi")
+    .max(150, "Nama paket terlalu panjang"),
+  dpAmount: z.number().min(0).max(100000000).optional().default(5000000),
+  monthlyPlan: z.number().min(0).max(50000000).optional().nullable(),
+  notes: z.string().trim().max(500, "Catatan maksimal 500 karakter").optional().nullable(),
+});
+
+export const updateLeadSchema = z.object({
+  status: z.enum(["NEW", "CONTACTED", "INTERESTED", "DP_PAID", "CLOSED_WON"]).optional(),
+  notes: z.string().trim().max(500).optional().nullable(),
+  packageInterest: z.string().trim().max(150).optional(),
+  monthlyPlan: z.number().min(0).max(50000000).optional().nullable(),
+  lastContactedAt: z.boolean().optional(), // if true, sets lastContactedAt to now()
+});
+
+/**
+ * Gamified Daily Mission Progress Schema
+ */
+export const updateMissionProgressSchema = z.object({
+  action: z.enum(["ADD_CONTACT", "SEND_WHATSAPP"]),
+  increment: z.number().min(1).max(5).optional().default(1),
+  contactId: z.string().optional(),
+});
+
+/**
+ * Radar Roulette Claim Schema
+ */
+export const claimRouletteSchema = z.object({
+  rouletteId: z.string().min(5, "ID peluang tidak valid"),
+});
+

@@ -35,6 +35,9 @@ model User {
   orders           Order[]
   payoutRequests   PayoutRequest[]
   purchasedPosters MarketerPoster[]
+  leads            MarketerLead[]  @relation("UserLeads")
+  dailyMissions    DailyMission[]  @relation("UserMissions")
+  claimedRoulettes LeadRoulette[]  @relation("UserClaimedRoulettes")
   createdAt        DateTime        @default(now())
 }
 
@@ -164,5 +167,86 @@ model PilgrimPhoto {
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
+}
+
+// ==============================================================================
+// 1. جدول عملاء المسوق وحاسبة التوفير (Mini-CRM & Tabungan Leads)
+// ==============================================================================
+model MarketerLead {
+  id              String     @id @default(cuid())
+  marketerId      Int
+  marketer        User       @relation("UserLeads", fields: [marketerId], references: [id], onDelete: Cascade)
+  clientName      String
+  whatsappNumber  String
+  source          LeadSource @default(MANUAL_MISSION) // مصدر العميل: مهمة يومية، حاسبة التوفير، أو الرادار
+  status          LeadStatus @default(NEW)
+  packageInterest String     // مثال: "NOVEMBER_30_9JT" أو "DECEMBER_31_5JT"
+  dpAmount        Float      @default(5000000) // الدفعة الأولى 5 مليون روبية (DP)
+  monthlyPlan     Float?     // القسط الشهري المحسوب في أداة التوفير
+  notes           String?
+  lastContactedAt DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([marketerId, status])
+  @@index([whatsappNumber])
+}
+
+// ==============================================================================
+// 2. جدول المهام اليومية وفتح الرادار (Gamified Daily Missions)
+// ==============================================================================
+model DailyMission {
+  id                 String   @id @default(cuid())
+  marketerId         Int
+  marketer           User     @relation("UserMissions", fields: [marketerId], references: [id], onDelete: Cascade)
+  missionDate        String   // بصيغة "YYYY-MM-DD" لضمان سجل واحد لكل مسوق يومياً
+  contactsAddedCount Int      @default(0) // الهدف اليومي: 3 جهات اتصال
+  whatsappSentCount  Int      @default(0) // عدد رسائل الواتساب المرسلة فعلياً
+  isRadarUnlocked    Boolean  @default(false) // يتحول إلى true تلقائياً عند إكمال 3 مراسلات
+  pointsEarned       Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([marketerId, missionDate])
+  @@index([marketerId, isRadarUnlocked])
+}
+
+// ==============================================================================
+// 3. جدول رادار الفرص الساخنة (Lead Roulette Pool)
+// ==============================================================================
+model LeadRoulette {
+  id              String         @id @default(cuid())
+  clientName      String
+  whatsappNumber  String
+  city            String         @default("Bogor/Jakarta")
+  packageInterest String
+  status          RouletteStatus @default(AVAILABLE)
+  claimedById     Int?           // معرّف المسوق الذي اقتنص الفرصة أولاً
+  claimedBy       User?          @relation("UserClaimedRoulettes", fields: [claimedById], references: [id], onDelete: SetNull)
+  claimedAt       DateTime?
+  createdAt       DateTime       @default(now())
+
+  @@index([status, createdAt])
+}
+
+enum LeadSource {
+  MANUAL_MISSION
+  TABUNGAN_CALCULATOR
+  RADAR_ROULETTE
+  LANDING_PAGE
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  INTERESTED
+  DP_PAID
+  CLOSED_WON
+}
+
+enum RouletteStatus {
+  AVAILABLE
+  CLAIMED
+  EXPIRED
 }
 

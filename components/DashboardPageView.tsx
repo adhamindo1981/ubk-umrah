@@ -12,6 +12,10 @@ import { MarketerActions } from "@/app/dashboard/MarketerActions";
 import { UbkLogo } from "@/components/UbkLogo";
 import { LogoutButton } from "@/components/LogoutButton";
 import { getPublicBaseUrl } from "@/lib/urlUtils";
+import { DailyMissionsCard } from "@/components/DailyMissionsCard";
+import { TabunganCalculatorModal } from "@/components/TabunganCalculatorModal";
+import { RadarRouletteModal } from "@/components/RadarRouletteModal";
+import { MiniCrmView } from "@/components/MiniCrmView";
 import Link from "next/link";
 
 export interface DashboardPageViewProps {
@@ -81,6 +85,33 @@ export function DashboardPageView({
   const [activeUrl, setActiveUrl] = useState<string>(personalPageUrl);
   const [activeWaLink, setActiveWaLink] = useState<string>(waLink);
   const [activeQrCode, setActiveQrCode] = useState<string>(qrCodeDataUrl);
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState<boolean>(false);
+  const [isRadarOpen, setIsRadarOpen] = useState<boolean>(false);
+  const [missionData, setMissionData] = useState<any>(null);
+  const [totalPoints, setTotalPoints] = useState<number>(0);
+  const [crmRefreshKey, setCrmRefreshKey] = useState<number>(0);
+
+  const fetchMission = async () => {
+    try {
+      const res = await fetch("/api/missions");
+      if (res.ok) {
+        const data = await res.json();
+        setMissionData(data.mission);
+        setTotalPoints(data.totalPoints || 0);
+      }
+    } catch (err) {
+      console.error("Error fetching daily mission:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchMission();
+  }, []);
+
+  const handleLeadSavedOrClaimed = () => {
+    fetchMission();
+    setCrmRefreshKey((prev) => prev + 1);
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined" && user.referralCode) {
@@ -163,6 +194,47 @@ export function DashboardPageView({
             )}
 
             <div className="shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsCalculatorOpen(true)}
+                className="shrink-0 text-xs font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-xl transition inline-flex items-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
+              >
+                <span>🧮</span>
+                <span>{isArabic ? "حاسبة التوفير" : "Kalkulator Tabungan"}</span>
+              </button>
+            </div>
+
+            <div className="shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsRadarOpen(true)}
+                className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-xl transition inline-flex items-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 ${
+                  missionData?.isRadarUnlocked
+                    ? "text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-300 ring-2 ring-rose-400/40 animate-pulse"
+                    : "text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300"
+                }`}
+              >
+                <span>🎯</span>
+                <span>{isArabic ? "رادار الفرص" : "Radar Peluang"}</span>
+                {missionData?.isRadarUnlocked && (
+                  <span className="text-[10px] bg-rose-600 text-white px-1.5 py-0.2 rounded-full font-black">
+                    HOT
+                  </span>
+                )}
+              </button>
+            </div>
+
+            <div className="shrink-0">
+              <a
+                href="#mini-crm-section"
+                className="shrink-0 text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-xl transition inline-flex items-center gap-1.5 shadow-2xs"
+              >
+                <span>👥</span>
+                <span>{isArabic ? "إدارة العملاء CRM" : "Mini-CRM"}</span>
+              </a>
+            </div>
+
+            <div className="shrink-0">
               <InviteMarketerModal />
             </div>
 
@@ -188,6 +260,15 @@ export function DashboardPageView({
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
+        {/* Gamified Daily Missions & Roulette Card */}
+        <DailyMissionsCard
+          mission={missionData}
+          totalPoints={totalPoints}
+          onOpenRadar={() => setIsRadarOpen(true)}
+          onOpenCalculator={() => setIsCalculatorOpen(true)}
+          onMissionUpdated={fetchMission}
+        />
+
         {/* Top Promotional & Personal Page Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Card 1: Saldo Komisi Rupiah */}
@@ -304,6 +385,15 @@ export function DashboardPageView({
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Section: Mini-CRM & Tabungan Leads */}
+        <div id="mini-crm-section" className="scroll-mt-24">
+          <MiniCrmView
+            key={crmRefreshKey}
+            onOpenCalculator={() => setIsCalculatorOpen(true)}
+            onLeadUpdated={handleLeadSavedOrClaimed}
+          />
         </div>
 
         {/* Section: QR Code & Marketing Assets */}
@@ -622,6 +712,21 @@ export function DashboardPageView({
           </div>
         </div>
       )}
+      {/* Smart Tabungan Umrah Calculator Modal */}
+      <TabunganCalculatorModal
+        isOpen={isCalculatorOpen}
+        onClose={() => setIsCalculatorOpen(false)}
+        onLeadSaved={handleLeadSavedOrClaimed}
+        marketerCode={user.referralCode || ""}
+        marketerName={user.username}
+      />
+
+      {/* Hot Leads Roulette Radar Modal */}
+      <RadarRouletteModal
+        isOpen={isRadarOpen}
+        onClose={() => setIsRadarOpen(false)}
+        onLeadClaimed={handleLeadSavedOrClaimed}
+      />
     </div>
   );
 }

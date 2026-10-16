@@ -14,6 +14,9 @@ ALTER TABLE IF EXISTS "MarketerPoster" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS "SystemSetting" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS "UmrahPackage" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS "PilgrimPhoto" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "MarketerLead" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "DailyMission" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "LeadRoulette" ENABLE ROW LEVEL SECURITY;
 
 -- ------------------------------------------------------------------------------
 -- Helper function to extract authenticated user's ID and role from JWT or session
@@ -193,3 +196,43 @@ DROP POLICY IF EXISTS "Public read non-sensitive system settings" ON "SystemSett
 CREATE POLICY "Public read non-sensitive system settings" ON "SystemSetting"
   FOR SELECT
   USING ("key" LIKE 'company%');
+
+-- ------------------------------------------------------------------------------
+-- 9. POLICIES FOR "MarketerLead", "DailyMission", "LeadRoulette"
+-- Isolates leads and missions per marketer. Manages lead roulette pool.
+-- ------------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Admins full access on MarketerLead" ON "MarketerLead";
+CREATE POLICY "Admins full access on MarketerLead" ON "MarketerLead"
+  FOR ALL
+  USING (is_app_admin());
+
+DROP POLICY IF EXISTS "Marketers manage own leads" ON "MarketerLead";
+CREATE POLICY "Marketers manage own leads" ON "MarketerLead"
+  FOR ALL
+  USING ("marketerId" = current_app_user_id());
+
+DROP POLICY IF EXISTS "Admins full access on DailyMission" ON "DailyMission";
+CREATE POLICY "Admins full access on DailyMission" ON "DailyMission"
+  FOR ALL
+  USING (is_app_admin());
+
+DROP POLICY IF EXISTS "Marketers manage own missions" ON "DailyMission";
+CREATE POLICY "Marketers manage own missions" ON "DailyMission"
+  FOR ALL
+  USING ("marketerId" = current_app_user_id());
+
+DROP POLICY IF EXISTS "Admins full access on LeadRoulette" ON "LeadRoulette";
+CREATE POLICY "Admins full access on LeadRoulette" ON "LeadRoulette"
+  FOR ALL
+  USING (is_app_admin());
+
+DROP POLICY IF EXISTS "Marketers view roulette pool" ON "LeadRoulette";
+CREATE POLICY "Marketers view roulette pool" ON "LeadRoulette"
+  FOR SELECT
+  USING (status = 'AVAILABLE' OR "claimedById" = current_app_user_id());
+
+DROP POLICY IF EXISTS "Marketers claim roulette leads" ON "LeadRoulette";
+CREATE POLICY "Marketers claim roulette leads" ON "LeadRoulette"
+  FOR UPDATE
+  USING (status = 'AVAILABLE')
+  WITH CHECK ("claimedById" = current_app_user_id() AND status = 'CLAIMED');
