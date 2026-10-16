@@ -1,0 +1,49 @@
+{
+  "name": "UBK Partner App - Umar Bin Alkhattab for Umrah",
+  "short_name": "UBK Partner",
+  "description": "All-in-One Umrah Sales Engine, Gamified Daily Missions & Marketer CRM",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#022c22",
+  "theme_color": "#047857",
+  "icons": [
+    {
+      "src": "/images/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "finance", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Misi & Radar",
+      "short_name": "Misi",
+      "description": "Buka Target Harian & Radar Peluang",
+      "url": "/dashboard?tab=misi",
+      "icons": [{ "src": "/images/logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Jamaah Saya",
+      "short_name": "CRM",
+      "description": "Kelola Prospek & Kirim WA Pintar",
+      "url": "/dashboard?tab=crm",
+      "icons": [{ "src": "/images/logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Bantu Jawab",
+      "short_name": "Asisten",
+      "description": "Skrip Penjawab Ragu Jamaah",
+      "url": "/dashboard?tab=asisten",
+      "icons": [{ "src": "/images/logo.png", "sizes": "96x96" }]
+    }
+  ]
+}

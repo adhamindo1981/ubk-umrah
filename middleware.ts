@@ -108,6 +108,23 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // A2. Public Tabungan Umrah Calculator Lead Capture - Max 10 requests / 5 mins
+  if (pathname === "/api/public/tabungan-lead" && request.method === "POST") {
+    const { allowed, retryAfterSec } = checkRateLimit(`tabungan_${clientIp}`, 10, 5 * 60 * 1000);
+    if (!allowed) {
+      return NextResponse.json(
+        {
+          error:
+            "Terlalu banyak simulasi tabungan dari perangkat Anda. Silakan tunggu beberapa menit / يرجى الانتظار قليلاً قبل طلب محاكاة جديدة.",
+        },
+        {
+          status: 429,
+          headers: { "Retry-After": String(retryAfterSec) },
+        }
+      );
+    }
+  }
+
   // B. Marketer Registration (/api/auth/register) - Max 5 accounts / 15 mins
   if (pathname === "/api/auth/register" && request.method === "POST") {
     const { allowed, retryAfterSec } = checkRateLimit(`reg_${clientIp}`, 5, 15 * 60 * 1000);

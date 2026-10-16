@@ -13,6 +13,7 @@ import { PilgrimMarqueeGallery } from "@/components/PilgrimMarqueeGallery";
 import { OfficialAccreditationSection } from "@/components/OfficialAccreditationSection";
 import { SocialMediaIcons } from "@/components/SocialMediaIcons";
 import { ProtectedPosterModal } from "@/components/ProtectedPosterModal";
+import { TabunganCalculator } from "@/components/landing/TabunganCalculator";
 import Link from "next/link";
 
 interface FeaturedPoster {
@@ -343,6 +344,13 @@ export function MarketerPageView({ marketer }: MarketerPageViewProps) {
 
       {/* Umrah Packages Section with Islamic Mihrab Arches & Arabesque Cards */}
       <UmrahPackagesSection onSelectPackage={setSelectedPackage} />
+
+      {/* Interactive Public Feature: Simulasi Tabungan Umrah (Cukup DP 5 Juta Kunci Seat) */}
+      <TabunganCalculator
+        marketerCode={marketer.referralCode}
+        marketerName={marketer.username}
+        marketerWhatsapp={marketer.whatsapp}
+      />
 
       {/* Booking Form Section */}
       <section id="form-booking" className="relative py-16 sm:py-24 px-4 sm:px-6 bg-slate-900 border-t border-amber-500/20 overflow-hidden">

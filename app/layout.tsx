@@ -17,10 +17,11 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "UBK for Umrah | عمر بن الخطاب للعمرة",
   description: "خدمات العمرة المتميزة وتطبيقات ومسوقي رحلات العمرة المعتمدة",
+  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "UBK Umrah",
+    title: "UBK Partner",
   },
   formatDetection: {
     telephone: false,

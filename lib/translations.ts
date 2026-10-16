@@ -229,6 +229,15 @@ export const translations = {
     shareViaWa: "Bagikan Akses Login via WhatsApp 📲",
     closeBtn: "Tutup",
 
+    // Sales Engine & Tabungan Umrah
+    salesEngineTitle: "Mesin Penjualan Umrah PWA",
+    tabMisiRadar: "🎯 Misi & Radar Peluang",
+    tabMyJamaah: "👥 Jamaah Saya (CRM)",
+    tabObjectionAssistant: "🤖 Asisten Pintar (Bantu Jawab)",
+    tabPromoKit: "🖼️ Kit Promosi & Media",
+    simulasiTabunganTitle: "Simulasi Tabungan Umrah",
+    cukupDp5Jt: "Cukup DP Rp 5.000.000 Kunci Seat",
+
     // Footer
     footerRights: "Hak Cipta Dilindungi Undang-Undang Umar Bin Alkhattab for Umrah (UBK).",
     designerCredit: "Desain & Produksi @ADHAM BUGIS",
@@ -461,6 +470,15 @@ export const translations = {
     tempPasswordLabel: "كلمة المرور المؤقتة:",
     shareViaWa: "إرسال بيانات الدخول عبر الواتساب 📲",
     closeBtn: "إغلاق",
+
+    // Sales Engine & Tabungan Umrah
+    salesEngineTitle: "محرك مبيعات العمرة PWA",
+    tabMisiRadar: "🎯 المهام اليومية ورادار الفرص",
+    tabMyJamaah: "👥 قائمة المعتمرين (CRM)",
+    tabObjectionAssistant: "🤖 المساعد الذكي (تخطي الاعتراضات)",
+    tabPromoKit: "🖼️ حقيبة الترويج والوسائط",
+    simulasiTabunganTitle: "حاسبة التوفير الذكية للعمرة",
+    cukupDp5Jt: "دفعة أولى 5 مليون روبية فقط لقفل المقعد",
 
     // Footer
     footerRights: "جميع الحقوق محفوظة © عمر بن الخطاب للعمرة (UBK).",

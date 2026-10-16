@@ -16,6 +16,7 @@ import { DailyMissionsCard } from "@/components/DailyMissionsCard";
 import { TabunganCalculatorModal } from "@/components/TabunganCalculatorModal";
 import { RadarRouletteModal } from "@/components/RadarRouletteModal";
 import { MiniCrmView } from "@/components/MiniCrmView";
+import { SalesEngineHub } from "@/components/marketer/SalesEngineHub";
 import Link from "next/link";
 
 export interface DashboardPageViewProps {
@@ -260,15 +261,6 @@ export function DashboardPageView({
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
-        {/* Gamified Daily Missions & Roulette Card */}
-        <DailyMissionsCard
-          mission={missionData}
-          totalPoints={totalPoints}
-          onOpenRadar={() => setIsRadarOpen(true)}
-          onOpenCalculator={() => setIsCalculatorOpen(true)}
-          onMissionUpdated={fetchMission}
-        />
-
         {/* Top Promotional & Personal Page Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Card 1: Saldo Komisi Rupiah */}
@@ -387,12 +379,18 @@ export function DashboardPageView({
           </div>
         </div>
 
-        {/* Section: Mini-CRM & Tabungan Leads */}
-        <div id="mini-crm-section" className="scroll-mt-24">
-          <MiniCrmView
-            key={crmRefreshKey}
-            onOpenCalculator={() => setIsCalculatorOpen(true)}
-            onLeadUpdated={handleLeadSavedOrClaimed}
+        {/* Mobile-First PWA All-in-One Umrah Sales Engine Hub */}
+        <div className="pt-2">
+          <SalesEngineHub
+            user={{
+              id: user.id,
+              username: user.username,
+              referralCode: user.referralCode,
+              whatsapp: user.whatsapp,
+            }}
+            personalPageUrl={activeUrl}
+            waLink={activeWaLink}
+            qrCodeDataUrl={activeQrCode}
           />
         </div>
 
