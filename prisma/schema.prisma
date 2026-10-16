@@ -251,3 +251,18 @@ enum RouletteStatus {
   EXPIRED
 }
 
+// ==============================================================================
+// 4. جدول تتبع الحصة اليومية لتوليد الصور بالذكاء الاصطناعي (AI Studio Quota)
+// ==============================================================================
+model DailyImageQuota {
+  id         String   @id @default(cuid())
+  marketerId String
+  date       String   // YYYY-MM-DD
+  count      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([marketerId, date])
+  @@index([marketerId])
+}
+

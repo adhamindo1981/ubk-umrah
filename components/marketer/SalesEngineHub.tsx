@@ -38,6 +38,8 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { ObjectionAssistant } from "@/components/marketer/ObjectionAssistant";
 import { PosterMarketplaceModal } from "@/components/PosterMarketplaceModal";
 import { normalizeIndonesianPhone } from "@/lib/validations";
+import { AiStudioView } from "@/components/ai-studio/AiStudioView";
+import { isAiStudioEnabled } from "@/lib/ai-studio/flags";
 
 export interface SalesEngineHubProps {
   user: {
@@ -93,8 +95,9 @@ export function SalesEngineHub({
 }: SalesEngineHubProps) {
   const { isArabic } = useLanguage();
 
-  // Active Tab State (misi | crm | asisten | media)
-  const [activeTab, setActiveTab] = useState<"misi" | "crm" | "asisten" | "media">("misi");
+  // Active Tab State (misi | crm | asisten | media | ai-studio)
+  const [activeTab, setActiveTab] = useState<"misi" | "crm" | "asisten" | "media" | "ai-studio">("misi");
+  const aiStudioAvailable = isAiStudioEnabled();
 
   // Mission & Roulette States
   const [mission, setMission] = useState<DailyMissionData | null>(null);
@@ -376,21 +379,28 @@ export function SalesEngineHub({
 
       {/* Desktop / Tablet Navigation Tabs */}
       <div className="bg-white rounded-2xl border border-slate-200 p-1.5 shadow-xs hidden sm:flex items-center justify-between gap-2">
-        {(
-          [
-            { id: "misi", label: "🎯 Misi & Radar Peluang", labelAr: "🎯 المهام والرادار" },
-            { id: "crm", label: "👥 Jamaah Saya (CRM)", labelAr: "👥 قائمة العملاء" },
-            { id: "asisten", label: "🤖 Asisten Pintar (Bantu Jawab)", labelAr: "🤖 المساعد الذكي" },
-            { id: "media", label: "🖼️ Kit Promosi & Media", labelAr: "🖼️ حقيبة الترويج" },
-          ] as const
-        ).map((tab) => {
+        {[
+          { id: "misi" as const, label: "🎯 Misi & Radar", labelAr: "🎯 المهام والرادار" },
+          { id: "crm" as const, label: "👥 Jamaah Saya (CRM)", labelAr: "👥 قائمة العملاء" },
+          ...(aiStudioAvailable
+            ? [
+                {
+                  id: "ai-studio" as const,
+                  label: "✨ Studio AI (Konten & Gambar)",
+                  labelAr: "✨ استوديو الذكاء الاصطناعي",
+                },
+              ]
+            : []),
+          { id: "asisten" as const, label: "🤖 Bantu Jawab", labelAr: "🤖 المساعد الذكي" },
+          { id: "media" as const, label: "🖼️ Kit Media", labelAr: "🖼️ حقيبة الترويج" },
+        ].map((tab) => {
           const active = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-3 px-4 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
+              className={`flex-1 py-3 px-3 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ${
                 active
                   ? "bg-slate-900 text-emerald-400 shadow-md shadow-slate-900/10 font-black"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
@@ -818,6 +828,17 @@ export function SalesEngineHub({
       )}
 
       {/* =========================================================================
+          TAB AI STUDIO: KONTEN COPYWRITING & GAMBAR AI (FEATURE FLAG PROTECTED)
+      ========================================================================== */}
+      {activeTab === "ai-studio" && aiStudioAvailable && (
+        <AiStudioView
+          marketerName={user.username}
+          referralCode={user.referralCode || ""}
+          personalLandingUrl={personalPageUrl}
+        />
+      )}
+
+      {/* =========================================================================
           TAB 3: ASISTEN PINTAR (BANTU JAWAB / OBJECTION HANDLER)
       ========================================================================== */}
       {activeTab === "asisten" && (
@@ -977,14 +998,15 @@ export function SalesEngineHub({
         className="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-slate-950/95 backdrop-blur-xl border-t border-amber-500/20 px-2 py-2 shadow-2xl safe-bottom"
       >
         <div className="flex items-center justify-around">
-          {(
-            [
-              { id: "misi" as const, icon: Target, label: "Misi & Radar", alert: isUnlocked, badge: 0 },
-              { id: "crm" as const, icon: Users, label: "Jamaah Saya", alert: false, badge: leads.length },
-              { id: "asisten" as const, icon: Bot, label: "Bantu Jawab", alert: false, badge: 0 },
-              { id: "media" as const, icon: ImageIcon, label: "Kit Media", alert: false, badge: 0 },
-            ]
-          ).map((item) => {
+          {[
+            { id: "misi" as const, icon: Target, label: "Misi & Radar", alert: isUnlocked, badge: 0 },
+            { id: "crm" as const, icon: Users, label: "Jamaah Saya", alert: false, badge: leads.length },
+            ...(aiStudioAvailable
+              ? [{ id: "ai-studio" as const, icon: Sparkles, label: "Studio AI", alert: false, badge: 0 }]
+              : []),
+            { id: "asisten" as const, icon: Bot, label: "Bantu Jawab", alert: false, badge: 0 },
+            { id: "media" as const, icon: ImageIcon, label: "Kit Media", alert: false, badge: 0 },
+          ].map((item) => {
             const active = activeTab === item.id;
             const Icon = item.icon;
             return (
