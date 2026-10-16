@@ -58,15 +58,18 @@ function CounterItem({
       ref={ref}
       whileHover={{ y: -4, scale: 1.02 }}
       transition={{ duration: 0.2 }}
-      className="relative flex flex-col items-center sm:items-start text-center sm:text-start p-4 sm:p-5 rounded-2xl bg-slate-900/60 border border-amber-500/20 backdrop-blur-md hover:border-amber-400/50 hover:bg-slate-900/90 transition-all duration-300 group"
+      className="relative flex flex-col items-center sm:items-start text-center sm:text-start p-4 sm:p-5 rounded-2xl bg-slate-900 border border-amber-500/20 hover:border-amber-400/50 hover:bg-slate-900/90 transition-all duration-300 shadow-lg group"
     >
       <div className="flex items-center gap-3 mb-2">
-        <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-400/30 text-amber-400 flex items-center justify-center shadow-inner group-hover:scale-110 group-hover:bg-amber-500/20 transition-transform duration-300">
+        <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-400/30 text-amber-400 flex items-center justify-center shadow-inner group-hover:scale-110 group-hover:bg-amber-500/20 transition-transform duration-300 shrink-0">
           {icon}
         </div>
-        <div className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-baseline">
+        <div
+          dir="ltr"
+          className="text-2xl sm:text-3xl font-black text-white tracking-tight inline-flex items-baseline gap-1"
+        >
           <span>{count.toLocaleString()}</span>
-          <span className="text-amber-400 text-xl font-bold ml-0.5">{suffix}</span>
+          <span className="text-amber-400 text-lg font-bold">{suffix}</span>
         </div>
       </div>
       <div className="text-xs sm:text-sm font-extrabold text-slate-200">
@@ -86,8 +89,8 @@ export function FramerStatsCounter() {
   const { isArabic } = useLanguage();
 
   return (
-    <section className="relative -mt-6 sm:-mt-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 z-20">
-      <div className="rounded-3xl p-3 sm:p-4 bg-slate-950/80 border border-amber-500/30 backdrop-blur-xl shadow-2xl shadow-black/80">
+    <section className="relative mt-8 sm:mt-12 mb-12 sm:mb-16 max-w-7xl mx-auto px-4 sm:px-6 z-20">
+      <div className="rounded-3xl p-3 sm:p-5 bg-slate-950 border border-amber-500/30 shadow-2xl shadow-black">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <CounterItem
             icon={<ShieldCheck className="w-5 h-5" />}
@@ -119,7 +122,7 @@ export function FramerStatsCounter() {
           <CounterItem
             icon={<Zap className="w-5 h-5" />}
             endValue={300}
-            suffix=" km/h"
+            suffix={isArabic ? " كم/س" : " km/jam"}
             labelAr="قطار الحرمين السريع"
             labelId="Kereta Cepat Haramain"
             subAr="تنقل VIP فائق الراحة"
