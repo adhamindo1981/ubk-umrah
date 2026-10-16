@@ -134,13 +134,14 @@ export async function POST(req: Request) {
         : "https://ubk-umrah.vercel.app";
       const qrDataUrl = await generateQRCodeDataUrl(personalPageUrl);
 
+      const { escapeXml } = await import("@/lib/validations");
       const cleanSvg = decodeURIComponent(template.cleanImageUrl.replace("data:image/svg+xml;utf8,", ""));
       const brandedSvg = cleanSvg
-        .replace("{{MARKETER_NAME}}", user.username.toUpperCase())
-        .replace("{{MARKETER_WHATSAPP}}", user.whatsapp || "Hubungi Admin UBK")
-        .replace("{{MARKETER_CODE}}", user.referralCode || "UBK-PARTNER")
+        .replace("{{MARKETER_NAME}}", escapeXml(user.username.toUpperCase()))
+        .replace("{{MARKETER_WHATSAPP}}", escapeXml(user.whatsapp || "Hubungi Admin UBK"))
+        .replace("{{MARKETER_CODE}}", escapeXml(user.referralCode || "UBK-PARTNER"))
         .replace("{{MARKETER_QR}}", qrDataUrl)
-        .replace("{{LICENSE_KEY}}", licenseKey);
+        .replace("{{LICENSE_KEY}}", escapeXml(licenseKey));
 
       customizedImageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(brandedSvg)}`;
     }

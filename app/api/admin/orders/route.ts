@@ -27,9 +27,10 @@ export async function PATCH(request: Request) {
     const body = await request.json();
     const { orderId, status } = body;
 
-    if (!orderId || !status) {
+    const ALLOWED_ORDER_STATUSES = ["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELED"];
+    if (!orderId || !status || !ALLOWED_ORDER_STATUSES.includes(status)) {
       return NextResponse.json(
-        { error: "ID Pesanan dan Status wajib diisi" },
+        { error: "ID Pesanan dan Status yang valid wajib diisi (PENDING, IN_PROGRESS, COMPLETED, CANCELED)" },
         { status: 400 }
       );
     }

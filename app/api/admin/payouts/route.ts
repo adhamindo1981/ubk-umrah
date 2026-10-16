@@ -19,9 +19,10 @@ export async function PATCH(request: Request) {
     const body = await request.json();
     const { payoutId, status, receiptImageUrl, notes } = body;
 
-    if (!payoutId || !status) {
+    const ALLOWED_STATUSES = ["APPROVED", "REJECTED", "PENDING"];
+    if (!payoutId || !status || !ALLOWED_STATUSES.includes(status)) {
       return NextResponse.json(
-        { error: "رقم طلب السحب والحالة مطلوبان" },
+        { error: "رقم طلب السحب وحالة صالحة مطلوبان (APPROVED, REJECTED, PENDING)" },
         { status: 400 }
       );
     }

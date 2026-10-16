@@ -3,31 +3,26 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
 import { generateShortReferralCode } from "@/lib/referral";
 
+import { registerUserSchema } from "@/lib/validations";
+
 /**
  * API route to register a new Marketer / Partner.
  * Accepts: { username, email, password, whatsapp?, parentReferralCode? }
  * SECURITY HARDENING:
  * - 'role' is strictly locked to 'MARKETER' to prevent arbitrary Admin escalation.
- * - Minimum password length of 6 characters enforced.
+ * - Strict Zod validation on username, email, password, whatsapp, and referral code.
  */
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { username, email, password, whatsapp, parentReferralCode } = body;
+    const rawBody = await request.json();
+    const parseResult = registerUserSchema.safeParse(rawBody);
 
-    if (!username || !email || !password) {
-      return NextResponse.json(
-        { error: "Username, email, dan password wajib diisi / جميع الحقول مطلوبة" },
-        { status: 400 }
-      );
+    if (!parseResult.success) {
+      const firstError = parseResult.error.issues[0]?.message || "Data pendaftaran tidak valid";
+      return NextResponse.json({ error: firstError }, { status: 400 });
     }
 
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: "Kata sandi minimal 6 karakter / كلمة المرور يجب ألا تقل عن 6 أحرف" },
-        { status: 400 }
-      );
-    }
+    const { username, email, password, whatsapp, parentReferralCode } = parseResult.data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({

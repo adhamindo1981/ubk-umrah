@@ -77,6 +77,13 @@ export async function POST(request: Request) {
     // If caller is MARKETER, parent is callerId. If caller is ADMIN, parent is null (direct)
     const parentId = callerRole === "ADMIN" ? null : callerId;
 
+    // Sanitize subMarketerShare to be between Rp 100.000 and Rp 500.000
+    const rawShare = Number(subMarketerShare);
+    const safeSubMarketerShare =
+      !isNaN(rawShare) && rawShare >= 100000 && rawShare <= 500000
+        ? rawShare
+        : 350000;
+
     const newMarketer = await prisma.user.create({
       data: {
         username: username.trim(),
@@ -86,7 +93,7 @@ export async function POST(request: Request) {
         mustChangePassword: true,
         isApproved: true,
         parentId: parentId,
-        subMarketerShare: subMarketerShare ? Number(subMarketerShare) : 350000,
+        subMarketerShare: safeSubMarketerShare,
         role: "MARKETER",
         referralCode: referralCode,
       },

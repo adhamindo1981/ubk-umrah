@@ -5,6 +5,8 @@ import { authOptions } from "@/lib/authOptions";
 
 
 
+import { payoutRequestSchema } from "@/lib/validations";
+
 const MIN_PAYOUT_IDR = 500000; // Rp 500.000
 
 /**
@@ -20,28 +22,21 @@ export async function POST(request: Request) {
     }
 
     const marketerId = Number((session.user as any).id);
-    const body = await request.json();
-    const { amountToWithdraw, bankInfo } = body;
+    const rawBody = await request.json();
+    
+    // Normalize amountToWithdraw to number
+    const normalizedBody = {
+      ...rawBody,
+      amountToWithdraw: Number(rawBody.amountToWithdraw),
+    };
 
-    const amountNum = Number(amountToWithdraw);
-
-    if (!amountNum || isNaN(amountNum) || !bankInfo || bankInfo.trim() === "") {
-      return NextResponse.json(
-        { error: "Mohon tentukan nominal penarikan dan rekening bank / E-Wallet tujuan." },
-        { status: 400 }
-      );
+    const parseResult = payoutRequestSchema.safeParse(normalizedBody);
+    if (!parseResult.success) {
+      const firstError = parseResult.error.issues[0]?.message || "Data penarikan dana tidak valid";
+      return NextResponse.json({ error: firstError }, { status: 400 });
     }
 
-    // Enforce minimum Rp 500.000 and multiples of Rp 500.000
-    if (amountNum < MIN_PAYOUT_IDR || amountNum % MIN_PAYOUT_IDR !== 0) {
-      return NextResponse.json(
-        {
-          error:
-            "Penarikan dana minimal Rp 500.000 dan harus dalam kelipatan Rp 500.000 (contoh: Rp 500.000, Rp 1.000.000, Rp 1.500.000, dst).",
-        },
-        { status: 400 }
-      );
-    }
+    const { amountToWithdraw: amountNum, bankInfo } = parseResult.data;
 
     // Check marketer's total available balance
     const user = await prisma.user.findUnique({

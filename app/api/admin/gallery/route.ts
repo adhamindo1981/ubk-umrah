@@ -48,20 +48,27 @@ export async function POST(request: Request) {
 
     let finalImageUrl = normalizeImageUrl(imageUrl) || "";
 
-    // If an image file base64 data URL is uploaded, save it to public/uploads/gallery
-    if (imageBase64 && imageBase64.startsWith("data:image")) {
-      const matches = imageBase64.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-      if (matches && matches.length === 3) {
-        const ext = matches[1].split("/")[1] || "jpg";
-        const buffer = Buffer.from(matches[2], "base64");
-        const filename = `pilgrim-${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${ext}`;
+    // If an image file base64 data URL is uploaded, validate type & size strictly
+    if (imageBase64) {
+      const { validateBase64Image } = await import("@/lib/validations");
+      const validation = validateBase64Image(imageBase64);
+      if (!validation.valid || !validation.buffer || !validation.extension) {
+        return NextResponse.json({ error: validation.error || "File gambar tidak valid" }, { status: 400 });
+      }
+
+      const safeUuid = crypto.randomUUID().replace(/-/g, "").substring(0, 12);
+      const filename = `pilgrim-${Date.now()}-${safeUuid}.${validation.extension}`;
+      try {
         const uploadDir = path.join(process.cwd(), "public", "uploads", "gallery");
         if (!fs.existsSync(uploadDir)) {
           fs.mkdirSync(uploadDir, { recursive: true });
         }
         const filePath = path.join(uploadDir, filename);
-        fs.writeFileSync(filePath, buffer);
+        fs.writeFileSync(filePath, validation.buffer);
         finalImageUrl = `/uploads/gallery/${filename}`;
+      } catch (fsErr) {
+        // Fallback to validated data URI in read-only environments
+        finalImageUrl = imageBase64;
       }
     }
 

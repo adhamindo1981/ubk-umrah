@@ -4,21 +4,23 @@ import { sendMail } from "@/lib/email";
 
 
 
+import { orderRegistrationSchema } from "@/lib/validations";
+
 /**
  * Handle new Umrah booking registrations.
  * Request JSON: { name, email, phone?, referralCode?, package? }
  */
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { name, email, phone, referralCode, package: selectedPackage } = body;
+    const rawBody = await request.json();
+    const parseResult = orderRegistrationSchema.safeParse(rawBody);
 
-    if (!name || !email) {
-      return NextResponse.json(
-        { error: "Nama dan email wajib diisi / الاسم والبريد الإلكتروني مطلوبان" },
-        { status: 400 }
-      );
+    if (!parseResult.success) {
+      const firstError = parseResult.error.issues[0]?.message || "Data pendaftaran tidak valid";
+      return NextResponse.json({ error: firstError }, { status: 400 });
     }
+
+    const { name, email, phone, referralCode, package: selectedPackage } = parseResult.data;
 
     // 1. Create or find Client
     let client = await prisma.client.findUnique({

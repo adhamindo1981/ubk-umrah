@@ -19,7 +19,15 @@ export async function PATCH(request: Request) {
     }
 
     const marketerId = Number((session.user as any).id);
-    const body = await request.json();
+    const rawBody = await request.json();
+
+    const { profileUpdateSchema } = await import("@/lib/validations");
+    const parseResult = profileUpdateSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      const firstError = parseResult.error.issues[0]?.message || "Data profil tidak valid";
+      return NextResponse.json({ error: firstError }, { status: 400 });
+    }
+
     const {
       whatsapp,
       bankName,
@@ -29,7 +37,7 @@ export async function PATCH(request: Request) {
       subMarketerShare,
       currentPassword,
       newPassword,
-    } = body;
+    } = parseResult.data;
 
     const currentUser = await prisma.user.findUnique({
       where: { id: marketerId },
