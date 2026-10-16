@@ -204,6 +204,7 @@ model DailyMission {
   whatsappSentCount  Int      @default(0) // عدد رسائل الواتساب المرسلة فعلياً
   isRadarUnlocked    Boolean  @default(false) // يتحول إلى true تلقائياً عند إكمال 3 مراسلات
   pointsEarned       Int      @default(0)
+  contactedLeadIds   String   @default("[]") // قائمة معرفات العملاء الذين تم التواصل معهم اليوم لضمان التفرد ومنع التكرار
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 

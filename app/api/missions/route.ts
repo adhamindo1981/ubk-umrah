@@ -110,25 +110,45 @@ export async function POST(request: Request) {
         data: {
           marketerId,
           missionDate: todayStr,
+          contactedLeadIds: "[]",
         },
       });
     }
 
+    const { leadId } = parseResult.data as any;
+    const targetLeadId = leadId || contactId;
+
     let updatedContacts = current.contactsAddedCount;
     let updatedWhatsapp = current.whatsappSentCount;
     let pointsToAdd = 0;
+    let alreadyCounted = false;
+
+    let contactedList: string[] = [];
+    try {
+      contactedList = JSON.parse(current.contactedLeadIds || "[]");
+      if (!Array.isArray(contactedList)) contactedList = [];
+    } catch {
+      contactedList = [];
+    }
 
     if (action === "ADD_CONTACT") {
       updatedContacts += increment;
       pointsToAdd += 10 * increment;
     } else if (action === "SEND_WHATSAPP") {
-      updatedWhatsapp += increment;
-      pointsToAdd += 25 * increment;
+      if (targetLeadId && contactedList.includes(targetLeadId)) {
+        alreadyCounted = true;
+      } else {
+        if (targetLeadId) {
+          contactedList.push(targetLeadId);
+        }
+        updatedWhatsapp += increment;
+        pointsToAdd += 25 * increment;
+      }
 
       // If a specific lead was contacted, update lead status
-      if (contactId) {
+      if (targetLeadId) {
         await prisma.marketerLead.updateMany({
-          where: { id: contactId, marketerId },
+          where: { id: targetLeadId, marketerId },
           data: {
             status: "CONTACTED",
             lastContactedAt: new Date(),
@@ -151,11 +171,13 @@ export async function POST(request: Request) {
         whatsappSentCount: updatedWhatsapp,
         isRadarUnlocked: shouldUnlockRadar || current.isRadarUnlocked,
         pointsEarned: { increment: pointsToAdd },
+        contactedLeadIds: JSON.stringify(contactedList),
       },
     });
 
     return NextResponse.json({
       success: true,
+      alreadyCounted,
       mission: {
         ...updatedMission,
         targetWhatsapp: WHATSAPP_DAILY_TARGET,

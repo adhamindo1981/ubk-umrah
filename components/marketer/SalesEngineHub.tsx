@@ -37,6 +37,7 @@ import {
 import { useLanguage } from "@/lib/LanguageContext";
 import { ObjectionAssistant } from "@/components/marketer/ObjectionAssistant";
 import { PosterMarketplaceModal } from "@/components/PosterMarketplaceModal";
+import { normalizeIndonesianPhone } from "@/lib/validations";
 
 export interface SalesEngineHubProps {
   user: {
@@ -205,37 +206,69 @@ export function SalesEngineHub({
     }
   };
 
-  // Action: Kirim WA Pintar & Increment Daily Mission
+  // Action: Kirim WA Pintar & Increment Daily Mission (Unique Leads Guard)
   const handleKirimWaPintar = async (lead: Lead) => {
+    // 1. Clean and normalize the lead's phone number (Indonesian 62... format)
+    const cleanPhone = normalizeIndonesianPhone(lead.whatsappNumber);
+
+    // 2. Determine package interest context
+    const packageText =
+      lead.packageInterest && lead.packageInterest.trim() !== ""
+        ? lead.packageInterest
+        : "Program Umrah 2026 (November / Desember 2026)";
+
+    // 3. Formulate professional Indonesian closing script with all key USPs
+    const message =
+      `Assalamu'alaikum Warahmatullahi Wabarakatuh Bapak/Ibu ${lead.clientName},\n\n` +
+      `Semoga senantiasa dalam limpahan berkah dan kesehatan Allah Ta'ala. Izin bersilaturahmi, saya ${user.username || "Konsultan Umrah"}, konsultan resmi UBK Umrah (Izin PPIU No. U-271 Tahun 2021).\n\n` +
+      `Menindaklanjuti rencana ibadah Umrah Bapak/Ibu untuk program *${packageText}*, izin kami sampaikan 4 keunggulan utama layanan kami:\n` +
+      `✈️ *Penerbangan Bintang 5:* Menggunakan maskapai terbaik dunia *Qatar Airways*\n` +
+      `🏨 *Hotel Dekat Masjid:* Jarak jalan kaki santai (*Hotel Tanpa Shuttle Bus*)\n` +
+      `💰 *Kemudahan Pembayaran:* Cukup *DP 5 Juta* untuk langsung amankan kuota seat Anda hari ini\n` +
+      `🍗 *Bonus Spesial:* Nikmati hidangan legendaris khas Saudi (*Free Albaik*) saat di Tanah Suci\n\n` +
+      `Rincian jadwal penerbangan dan simulasi tabungannya dapat dicek langsung melalui tautan resmi saya:\n` +
+      `${personalPageUrl}\n\n` +
+      `Apakah ada waktu sebentar jika kami bantu reservasikan seat-nya sebelum promo kuota habis? Terima kasih. 🙏`;
+
+    const encodedMessage = encodeURIComponent(message);
+
+    // 4. Trigger window.open immediately to guarantee execution without popup blockers
+    if (typeof window !== "undefined") {
+      window.open(`https://wa.me/${cleanPhone}?text=${encodedMessage}`, "_blank");
+    }
+
+    // 5. Concurrently notify backend API with unique lead guard
     try {
-      // 1. Increment mission count
-      await fetch("/api/marketer/missions", {
+      const res = await fetch("/api/marketer/missions/increment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "SEND_WHATSAPP", increment: 1 }),
+        body: JSON.stringify({
+          action: "SEND_WHATSAPP",
+          increment: 1,
+          leadId: lead.id,
+        }),
       });
 
-      // 2. Mark lastContactedAt in CRM
-      await fetch(`/api/marketer/leads?id=${lead.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lastContactedAt: true, status: "CONTACTED" }),
-      });
+      const data = await res.json();
 
-      // 3. Build personalized pitch
-      const cleanWa = lead.whatsappNumber.replace(/\D/g, "");
-      const pitchText = encodeURIComponent(
-        `Assalamu'alaikum Bapak/Ibu ${lead.clientName},\n\n` +
-          `Semoga senantiasa dalam lindungan Allah Ta'ala. Izin bersilaturahmi, saya ${user.username} konsultan resmi UBK Umrah (Izin PPIU No. U-271 Tahun 2021).\n\n` +
-          `Menindaklanjuti niat ibadah Anda untuk program *${lead.packageInterest}*, izin kami sampaikan bahwa penerbangan kami menggunakan maskapai bintang lima *Qatar Airways* dan *Hotel Dekat Masjid Tanpa Shuttle Bus* (jalan kaki santai).\n\n` +
-          `✨ *Kabar Baiknya:* Anda *Cukup DP Rp 5.000.000* untuk langsung mengamankan kuota seat hari ini, dan sudah termasuk gratis hidangan khas Albaik!\n\n` +
-          `Boleh cek rincian fasilitas lengkap dan simulasi tabungannya di tautan resmi saya ini:\n` +
-          `${personalPageUrl}\n\n` +
-          `Apakah ada waktu sebentar jika kami bantu reservasikan seat-nya sebelum kuota promo habis? Terima kasih. 🙏`
-      );
-
-      // Open WhatsApp
-      window.open(`https://wa.me/${cleanWa}?text=${pitchText}`, "_blank");
+      if (res.ok) {
+        if (data.alreadyCounted) {
+          setNotification({
+            type: "success",
+            text: `WhatsApp ${lead.clientName} dibuka! Prospek ini sudah dihitung dalam misi hari ini (hanya 1x per kontak unik per hari).`,
+          });
+        } else if (data.justUnlocked) {
+          setNotification({
+            type: "success",
+            text: "🎉 Luar Biasa! Misi Harian Selesai (3/3 kontak unik) & Radar Peluang Berhasil Terbuka!",
+          });
+        } else {
+          setNotification({
+            type: "success",
+            text: `WhatsApp ${lead.clientName} dibuka! Prospek unik berhasil dihitung (+25 Poin).`,
+          });
+        }
+      }
 
       // Refresh state
       fetchMissionAndRoulette();

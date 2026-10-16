@@ -88,7 +88,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: errorMsg }, { status: 400 });
     }
 
-    const { action, increment } = parseResult.data;
+    const { action, increment, contactId, leadId } = parseResult.data;
+    const targetLeadId = leadId || contactId;
 
     // Fetch existing mission
     let mission = await prisma.dailyMission.findUnique({
@@ -105,6 +106,7 @@ export async function POST(req: NextRequest) {
         data: {
           marketerId,
           missionDate: today,
+          contactedLeadIds: "[]",
         },
       });
     }
@@ -113,13 +115,45 @@ export async function POST(req: NextRequest) {
     let newContactsAdded = mission.contactsAddedCount;
     let newPoints = mission.pointsEarned;
     let shouldUnlockRadar = mission.isRadarUnlocked;
+    let alreadyCounted = false;
+
+    // Parse contacted lead IDs list
+    let contactedLeadIdsList: string[] = [];
+    try {
+      contactedLeadIdsList = JSON.parse(mission.contactedLeadIds || "[]");
+      if (!Array.isArray(contactedLeadIdsList)) {
+        contactedLeadIdsList = [];
+      }
+    } catch {
+      contactedLeadIdsList = [];
+    }
 
     if (action === "SEND_WHATSAPP") {
-      newWhatsappSent += increment;
-      newPoints += 25 * increment; // 25 points per WA touchpoint
-      if (newWhatsappSent >= 3 && !mission.isRadarUnlocked) {
-        shouldUnlockRadar = true;
-        newPoints += 100; // Bonus 100 points for unlocking radar
+      // UNIQUE LEAD GUARD:
+      // If a specific lead was already contacted today, prevent duplicate counting
+      if (targetLeadId && contactedLeadIdsList.includes(targetLeadId)) {
+        alreadyCounted = true;
+      } else {
+        if (targetLeadId) {
+          contactedLeadIdsList.push(targetLeadId);
+        }
+        newWhatsappSent += increment;
+        newPoints += 25 * increment; // 25 points per WA touchpoint
+        if (newWhatsappSent >= 3 && !mission.isRadarUnlocked) {
+          shouldUnlockRadar = true;
+          newPoints += 100; // Bonus 100 points for unlocking radar
+        }
+      }
+
+      // Always update lead in CRM if lead ID provided
+      if (targetLeadId) {
+        await prisma.marketerLead.updateMany({
+          where: { id: targetLeadId, marketerId },
+          data: {
+            status: "CONTACTED",
+            lastContactedAt: new Date(),
+          },
+        });
       }
     } else if (action === "ADD_CONTACT") {
       newContactsAdded += increment;
@@ -133,11 +167,13 @@ export async function POST(req: NextRequest) {
         contactsAddedCount: newContactsAdded,
         isRadarUnlocked: shouldUnlockRadar,
         pointsEarned: newPoints,
+        contactedLeadIds: JSON.stringify(contactedLeadIdsList),
       },
     });
 
     return NextResponse.json({
       success: true,
+      alreadyCounted,
       mission: {
         ...updated,
         targetWhatsapp: 3,
@@ -147,6 +183,9 @@ export async function POST(req: NextRequest) {
         ),
       },
       justUnlocked: !mission.isRadarUnlocked && shouldUnlockRadar,
+      message: alreadyCounted
+        ? "Pesan WhatsApp dibuka. Kontak ini sudah dihitung dalam misi hari ini (1x per kontak per hari)."
+        : "Progres misi harian berhasil ditambahkan.",
     });
   } catch (error) {
     console.error("Marketer Missions POST Error:", error);

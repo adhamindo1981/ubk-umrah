@@ -15,6 +15,7 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
+import { normalizeIndonesianPhone } from "@/lib/validations";
 
 export interface Lead {
   id: string;
@@ -434,8 +435,8 @@ export function MiniCrmView({ onOpenCalculator, onLeadUpdated }: MiniCrmViewProp
 
                   {/* Direct WhatsApp Chat Action */}
                   <a
-                    href={`https://wa.me/${lead.whatsappNumber.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
-                      `Assalamu'alaikum Warahmatullahi Wabarakatuh ${lead.clientName}, saya dari PT. Umar Bin Alkhattab for Umrah (UBK). Semoga kabar baik dan senantiasa dalam lindungan Allah. Terkait rencana ibadah Umrah Anda (${lead.packageInterest}), apakah ada hal yang ingin saya bantu jelaskan?`
+                    href={`https://wa.me/${normalizeIndonesianPhone(lead.whatsappNumber)}?text=${encodeURIComponent(
+                      `Assalamu'alaikum Warahmatullahi Wabarakatuh Bapak/Ibu ${lead.clientName},\n\nSemoga berkah dan sehat selalu. Saya konsultan resmi PT. Umar Bin Alkhattab for Umrah (UBK). Terkait rencana ibadah Umrah Anda untuk program *${lead.packageInterest || "2026"}*, izin kami infokan bahwa kami menyediakan paket dengan penerbangan Qatar Airways, Hotel dekat Masjid tanpa shuttle bus, kemudahan DP 5 Juta, dan bonus Free Albaik. Apakah ada hal yang ingin dibantu jelaskan? Terima kasih. 🙏`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"

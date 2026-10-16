@@ -217,12 +217,27 @@ export const updateLeadSchema = z.object({
 });
 
 /**
+ * Normalizes phone numbers to WhatsApp international format (especially Indonesian 62xxx)
+ */
+export function normalizeIndonesianPhone(phone: string | null | undefined): string {
+  if (!phone) return "";
+  let cleaned = String(phone).replace(/\D/g, "");
+  if (cleaned.startsWith("0")) {
+    cleaned = "62" + cleaned.slice(1);
+  } else if (cleaned.startsWith("8")) {
+    cleaned = "62" + cleaned;
+  }
+  return cleaned;
+}
+
+/**
  * Gamified Daily Mission Progress Schema
  */
 export const updateMissionProgressSchema = z.object({
   action: z.enum(["ADD_CONTACT", "SEND_WHATSAPP"]),
   increment: z.number().min(1).max(5).optional().default(1),
   contactId: z.string().optional(),
+  leadId: z.string().optional(),
 });
 
 /**
