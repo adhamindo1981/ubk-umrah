@@ -355,8 +355,8 @@ export function TabunganCalculator({
                 </span>
               </label>
 
-              <div className="grid grid-cols-3 gap-3">
-                {[3, 6, 12].map((months) => {
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                {[3, 6, 12, 18].map((months) => {
                   const active = installmentMonths === months;
                   return (
                     <button
@@ -373,7 +373,13 @@ export function TabunganCalculator({
                         {months} {isArabic ? "أشهر" : "Bulan"}
                       </div>
                       <div className="text-[10px] text-emerald-200 mt-0.5">
-                        {months === 3 ? "Cepat & Pas" : months === 6 ? "Rekomendasi" : "Paling Santai"}
+                        {months === 3
+                          ? "Cepat"
+                          : months === 6
+                          ? "Favorit"
+                          : months === 12
+                          ? "1 Tahun"
+                          : "1.5 Tahun"}
                       </div>
                     </button>
                   );

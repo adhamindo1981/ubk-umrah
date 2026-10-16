@@ -835,14 +835,14 @@ export function SalesEngineHub({
                   <a
                     href={qrCodeDataUrl}
                     download={`QR-UBK-${user.referralCode}.png`}
-                    className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition"
+                    className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-2xs"
                   >
                     ⬇️ Download QR (PNG)
                   </a>
                   <a
                     href={personalPageUrl}
                     target="_blank"
-                    className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition"
+                    className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition shadow-2xs"
                   >
                     🌐 Kunjungi Laman
                   </a>
@@ -850,6 +850,89 @@ export function SalesEngineHub({
               </div>
             </div>
           )}
+
+          {/* 60-Second Video Promo Catalog (TikTok & Reels Ready) */}
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 px-3 py-1 rounded-full font-mono">
+                  VIRAL REELS & TIKTOK READY (60 SECONDS)
+                </span>
+                <h4 className="text-lg font-black text-slate-900 mt-1">
+                  Katalog Video Promosi 60 Detik Resmi UBK
+                </h4>
+                <p className="text-xs text-slate-500">
+                  Video pendek format vertikal (9:16) untuk dipasang di Status WhatsApp, Instagram Reels, dan TikTok.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                {
+                  id: "vid-nov",
+                  title: "November 30.9 Jt (Qatar Airways)",
+                  duration: "45 Detik",
+                  desc: "Highlight hotel walking distance tanpa bus shuttle dan penerbangan Qatar Airways.",
+                  tag: "Paling Diminati",
+                },
+                {
+                  id: "vid-des",
+                  title: "Desember 31.5 Jt (Sheikh Bugis)",
+                  duration: "60 Detik",
+                  desc: "Cuplikan bimbingan ibadah eksklusif bersama Sheikh Dr. Hassan Bugis & Ummi Nurlaila.",
+                  tag: "Spesial Akhir Tahun",
+                },
+                {
+                  id: "vid-dp",
+                  title: "Cukup DP 5 Juta & Gratis Albaik",
+                  duration: "30 Detik",
+                  desc: "Edukasi kemudahan kunci seat cukup 5 Juta dan kuliner khas Albaik.",
+                  tag: "Solusi Tabungan",
+                },
+              ].map((vid) => (
+                <div
+                  key={vid.id}
+                  className="p-5 rounded-2xl bg-slate-50/70 border border-slate-200 hover:border-amber-400/50 hover:bg-white transition flex flex-col justify-between space-y-4"
+                >
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
+                        {vid.tag}
+                      </span>
+                      <span className="text-[11px] font-mono text-slate-400 font-bold">
+                        ⏱️ {vid.duration}
+                      </span>
+                    </div>
+                    <div className="font-extrabold text-sm text-slate-900">{vid.title}</div>
+                    <p className="text-xs text-slate-500 leading-relaxed">{vid.desc}</p>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between gap-2">
+                    <a
+                      href={personalPageUrl}
+                      target="_blank"
+                      className="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1"
+                    >
+                      <span>Lihat Contoh</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </a>
+                    <a
+                      href={`https://wa.me/?text=${encodeURIComponent(
+                        `Tonton video inspirasi Umrah resmi UBK (${vid.title}):\n${personalPageUrl}\n\nCukup DP Rp 5.000.000 langsung kunci seat!`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition flex items-center gap-1 shadow-2xs"
+                    >
+                      <Share2 className="w-3.5 h-3.5" />
+                      <span>Share WA</span>
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 

@@ -97,7 +97,7 @@ export const publicTabunganLeadSchema = z.object({
   installmentMonths: z
     .number()
     .int()
-    .refine((val) => [3, 6, 12].includes(val), "Pilihan angsuran hanya 3, 6, atau 12 bulan"),
+    .refine((val) => [3, 6, 12, 18].includes(val), "Pilihan angsuran hanya 3, 6, 12, atau 18 bulan"),
   totalPrice: z
     .number()
     .min(20000000, "Total harga paket tidak valid")
