@@ -100,11 +100,12 @@ export async function POST(req: NextRequest) {
       targetAudience = "KELUARGA",
       revisionInstructions,
       previousContent,
+      outputLanguage = "id", // "id" | "ar"
     } = body;
 
     if (!prompt && !revisionInstructions) {
       return NextResponse.json(
-        { error: "Topik atau instruksi copywriting wajib diisi." },
+        { error: outputLanguage === "ar" ? "يرجى كتابة موضوع أو فكرة المحتوى." : "Topik atau instruksi copywriting wajib diisi." },
         { status: 400 }
       );
     }
@@ -118,7 +119,23 @@ export async function POST(req: NextRequest) {
 
     if (groqApiKey) {
       try {
-        const systemPrompt = `Anda adalah Master Copywriter & Sales Funnel Strategist profesional khusus Biro Perjalanan Umrah resmi "UBK Umrah" (PT. Umar Bin Alkhattab for Umrah, Izin Kemenag PPIU No. U-271).
+        const isArabicOutput = outputLanguage === "ar";
+        const systemPrompt = isArabicOutput
+          ? `أنت خبير تسويق وكاتب محتوى إعلاني محترف (Master Copywriter) متخصص في حملات برامج العمرة المعتمدة لدى "شركة عمر بن الخطاب للعمرة - UBK Umrah" (ترخيص وزارة الشؤون الدينية الإندونيسية PPIU رقم U-271).
+مهمتك كتابة نصوص إعلانية وتسويقية راقية باللغة العربية الفصحى، مؤثرة وعالية الإقناع والتحويل (High-Converting Copy).
+
+المزايا التنافسية الرئيسية الواجب تضمينها بأسلوب طبيعي جذاب:
+1. دفعة أولى ميسرة فقط (DP 5 Juta / ما يعادل 5 ملايين روبية لتأكيد حجز المقعد فوراً).
+2. فنادق قريبة جداً من ساحات الحرم المكي والمسجد النبوي (سيراً على الأقدام بدون الحاجة لباصات التردد Shuttle Bus).
+3. خطوط طيران عالمية 5 نجوم (الخطوط الجوية القطرية - Qatar Airways).
+4. وجبة البيك الشهيرة مجاناً كضيافة خاصة للمعتمرين في مكة المكرمة.
+
+بيانات المستشار/المسوق:
+- اسم المستشار: ${marketerName}
+- رابط الصفحة المعتمدة: https://ubk-umrah.com/m/${referralCode || "resmi"}
+
+اكتب باللغة العربية الفصحى البليغة والواضحة مع تنسيق احترافي واستخدام متوازن للرموز التعبيرية وخاتمة تحث على المبادرة بالحجز.`
+          : `Anda adalah Master Copywriter & Sales Funnel Strategist profesional khusus Biro Perjalanan Umrah resmi "UBK Umrah" (PT. Umar Bin Alkhattab for Umrah, Izin Kemenag PPIU No. U-271).
 Tugas Anda adalah menulis materi copywriting bahasa Indonesia yang sangat persuasif, santun, berkelas, menyentuh hati (emotional resonance), dan menghasilkan konversi tinggi (High-Converting Copy).
 
 PANDUAN NILAI JUAL UTAMA (USPs WAJIB MUNCUL SECARA NATURAL):
@@ -135,9 +152,17 @@ Gunakan Bahasa Indonesia yang elegan, tata bahasa yang rapi, penggunaan emoji ya
 
         let userPrompt = "";
         if (previousContent && revisionInstructions) {
-          userPrompt = `Berikut adalah draft copywriting sebelumnya:\n"""\n${previousContent}\n"""\n\nTOLONG REVISI DRAFT DI ATAS DENGAN INSTRUKSI SPESIFIK BERIKUT:\n"${revisionInstructions}"\n\nPastikan tetap mempertahankan keunggulan UBK Umrah (DP 5 Juta, Hotel Tanpa Shuttle, Qatar Airways, Free Albaik).`;
+          userPrompt = isArabicOutput
+            ? `إليك المسودة الإعلانية السابقة:\n"""\n${previousContent}\n"""\n\nيرجى إعادة صياغة وتنقيح المسودة السابقة وفق التوجيهات التالية بدقة:\n"${revisionInstructions}"\n\nمع الحفاظ على المزايا التنافسية (DP 5 ملايين، فندق بدون باص، طيران القطرية، وجبة البيك مجاناً).`
+            : `Berikut adalah draft copywriting sebelumnya:\n"""\n${previousContent}\n"""\n\nTOLONG REVISI DRAFT DI ATAS DENGAN INSTRUKSI SPESIFIK BERIKUT:\n"${revisionInstructions}"\n\nPastikan tetap mempertahankan keunggulan UBK Umrah (DP 5 Juta, Hotel Tanpa Shuttle, Qatar Airways, Free Albaik).`;
         } else {
-          userPrompt = `Tuliskan naskah copywriting dengan spesifikasi:
+          userPrompt = isArabicOutput
+            ? `اكتب نصاً إعلانياً بالمواصفات التالية:
+- موضوع الإعلان / الفكرة: ${prompt}
+- المنصة والتنسيق: ${format} (رسالة واتساب، منشور إنستغرام، سيناريو فيديو تيك توك، بوست فيسبوك)
+- نبرة الحديث: ${tone} (إسلامية مهذبة، إقناعية للحجز السريع، تعليمية ملهمة، ودية)
+- الجمهور المستهدف: ${targetAudience} (عائلات، كبار سن، شباب وموظفون، مجموعات)`
+            : `Tuliskan naskah copywriting dengan spesifikasi:
 - Topik / Fokus: ${prompt}
 - Format Konten: ${format} (contoh: WhatsApp Closing, Instagram Caption, Script Video TikTok, Facebook Feed)
 - Gaya Bahasa / Tone: ${tone} (Islami Santun, Persuasif Halus, Edukatif Inspiratif, Santai Akrab)
