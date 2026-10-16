@@ -275,6 +275,40 @@ export function AiStudioView({
     setTimeout(() => setCopiedText(false), 2000);
   };
 
+  const handleDownloadImage = () => {
+    if (!generatedImageUrl) return;
+
+    try {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 1080;
+        canvas.height = 1080;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, 1080, 1080);
+          const pngUrl = canvas.toDataURL("image/png");
+          const a = document.createElement("a");
+          a.href = pngUrl;
+          a.download = `UBK-Umrah-Poster-${referralCode || "resmi"}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+      };
+      img.src = generatedImageUrl;
+    } catch (err) {
+      // Fallback direct download
+      const a = document.createElement("a");
+      a.href = generatedImageUrl;
+      a.download = `UBK-Umrah-Poster-${referralCode || "resmi"}.svg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  };
+
   const handleShareToWhatsApp = () => {
     if (!generatedCopy) return;
     const url = `https://wa.me/?text=${encodeURIComponent(generatedCopy)}`;
@@ -848,14 +882,14 @@ export function AiStudioView({
                 </div>
 
                 {generatedImageUrl && (
-                  <a
-                    href={generatedImageUrl}
-                    download="UBK-AI-Studio-Promo.jpg"
-                    className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer"
+                  <button
+                    type="button"
+                    onClick={handleDownloadImage}
+                    className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer active:scale-95"
                   >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>{isArabic ? "تحميل بجودة عالية (HD)" : "Download HD"}</span>
-                  </a>
+                    <Download className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{isArabic ? "تحميل البوستر بالباركود (HD)" : "Download HD + Barcode"}</span>
+                  </button>
                 )}
               </div>
 
