@@ -23,6 +23,8 @@ export async function GET(req: NextRequest) {
     }
 
     const marketerId = String((session.user as any).id);
+    const userRole = (session.user as any)?.role || "MARKETER";
+    const effectiveMaxQuota = userRole === "ADMIN" ? 100 : DAILY_MAX_QUOTA;
     const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
 
     const quotaRecord = await prisma.dailyImageQuota.findUnique({
@@ -35,15 +37,15 @@ export async function GET(req: NextRequest) {
     });
 
     const usedCount = quotaRecord ? quotaRecord.count : 0;
-    const remaining = Math.max(0, DAILY_MAX_QUOTA - usedCount);
+    const remaining = Math.max(0, effectiveMaxQuota - usedCount);
 
     return NextResponse.json({
       success: true,
       date: todayStr,
       usedCount,
-      maxQuota: DAILY_MAX_QUOTA,
+      maxQuota: effectiveMaxQuota,
       remaining,
-      isExhausted: usedCount >= DAILY_MAX_QUOTA,
+      isExhausted: usedCount >= effectiveMaxQuota,
     });
   } catch (error: any) {
     console.error("AI Studio Image Quota GET Error:", error);

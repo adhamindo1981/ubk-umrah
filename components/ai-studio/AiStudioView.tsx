@@ -77,6 +77,7 @@ export function AiStudioView({
   const [imageStyle, setImageStyle] = useState("realistic");
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState("");
+  const [generatedSvgXml, setGeneratedSvgXml] = useState("");
   const [imageProvider, setImageProvider] = useState("");
   const [quota, setQuota] = useState<ImageQuotaState>({
     usedCount: 0,
@@ -245,6 +246,7 @@ export function AiStudioView({
       const data = await res.json();
       if (res.ok && data.imageUrl) {
         setGeneratedImageUrl(data.imageUrl);
+        setGeneratedSvgXml(data.svgXml || "");
         setImageProvider(data.provider || "Hugging Face AI");
         if (data.quota) {
           setQuota(data.quota);
@@ -282,23 +284,45 @@ export function AiStudioView({
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = 1080;
-        canvas.height = 1080;
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, 1080, 1080);
-          const pngUrl = canvas.toDataURL("image/png");
-          const a = document.createElement("a");
-          a.href = pngUrl;
-          a.download = `UBK-Umrah-Poster-${referralCode || "resmi"}.png`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = 1080;
+          canvas.height = 1080;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, 1080, 1080);
+            const pngUrl = canvas.toDataURL("image/png");
+            const a = document.createElement("a");
+            a.href = pngUrl;
+            a.download = `UBK-Umrah-Poster-${referralCode || "resmi"}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            return;
+          }
+        } catch {
+          // If canvas taint error happens, fallback to direct download
         }
+
+        const a = document.createElement("a");
+        a.href = generatedImageUrl;
+        a.download = `UBK-Umrah-Poster-${referralCode || "resmi"}.svg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
       };
+
+      img.onerror = () => {
+        const a = document.createElement("a");
+        a.href = generatedImageUrl;
+        a.download = `UBK-Umrah-Poster-${referralCode || "resmi"}.svg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      };
+
       img.src = generatedImageUrl;
-    } catch (err) {
+    } catch {
       // Fallback direct download
       const a = document.createElement("a");
       a.href = generatedImageUrl;
@@ -901,13 +925,20 @@ export function AiStudioView({
                     animate={{ opacity: 1, scale: 1 }}
                     className="relative max-w-md w-full rounded-2xl overflow-hidden shadow-2xl border border-slate-800 group"
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={generatedImageUrl}
-                      alt="AI Generated Umrah Visual"
-                      className="w-full h-auto object-cover aspect-square"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition p-4 flex flex-col justify-end">
+                    {generatedSvgXml ? (
+                      <div
+                        className="w-full h-auto aspect-square rounded-2xl overflow-hidden [&>svg]:w-full [&>svg]:h-auto [&>svg]:block"
+                        dangerouslySetInnerHTML={{ __html: generatedSvgXml }}
+                      />
+                    ) : (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={generatedImageUrl}
+                        alt="AI Generated Umrah Visual"
+                        className="w-full h-auto object-cover aspect-square"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition p-4 flex flex-col justify-end pointer-events-none">
                       <span className="text-[10px] text-amber-300 font-bold uppercase tracking-wider">
                         UBK AI Studio Master
                       </span>

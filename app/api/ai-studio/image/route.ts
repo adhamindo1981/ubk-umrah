@@ -90,7 +90,7 @@ function createPhotorealisticBrandedPoster(params: {
   marketerPhone: string;
   referralCode: string;
   prompt: string;
-}): string {
+}): { dataUrl: string; svgXml: string } {
   const {
     realPhotoDataUrl,
     qrCodeDataUrl,
@@ -105,7 +105,7 @@ function createPhotorealisticBrandedPoster(params: {
   const safePhone = escapeXml(marketerPhone);
   const safeCode = escapeXml(referralCode || "UBK-OFFICIAL");
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1080 1080" width="1080" height="1080">
     <defs>
       <linearGradient id="topShadow" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stop-color="#021B1A" stop-opacity="0.92" />
@@ -142,7 +142,7 @@ function createPhotorealisticBrandedPoster(params: {
     <rect width="1080" height="1080" fill="#042F2E" />
     ${
       realPhotoDataUrl
-        ? `<image href="${realPhotoDataUrl}" x="0" y="0" width="1080" height="1080" preserveAspectRatio="xMidYMid slice" />`
+        ? `<image href="${realPhotoDataUrl}" xlink:href="${realPhotoDataUrl}" x="0" y="0" width="1080" height="1080" preserveAspectRatio="xMidYMid slice" />`
         : ""
     }
 
@@ -193,7 +193,7 @@ function createPhotorealisticBrandedPoster(params: {
       <rect x="24" y="24" width="200" height="200" rx="20" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="2" />
       ${
         qrCodeDataUrl
-          ? `<image href="${qrCodeDataUrl}" x="34" y="34" width="180" height="180" />`
+          ? `<image href="${qrCodeDataUrl}" xlink:href="${qrCodeDataUrl}" x="34" y="34" width="180" height="180" />`
           : `<rect x="34" y="34" width="180" height="180" fill="#047857" rx="12" />`
       }
 
@@ -240,7 +240,10 @@ function createPhotorealisticBrandedPoster(params: {
     </g>
   </svg>`.trim();
 
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  return {
+    dataUrl: `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`,
+    svgXml: svg,
+  };
 }
 
 export async function POST(req: NextRequest) {
@@ -270,6 +273,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const userRole = (session.user as any)?.role || "MARKETER";
+    const effectiveMaxQuota = userRole === "ADMIN" ? 100 : DAILY_MAX_QUOTA;
+
     // 1. QUOTA CHECK: Query current daily usage
     const quotaRecord = await prisma.dailyImageQuota.findUnique({
       where: {
@@ -283,14 +289,14 @@ export async function POST(req: NextRequest) {
     const currentCount = quotaRecord ? quotaRecord.count : 0;
 
     // 2. DAILY QUOTA EXHAUSTION GUARD
-    if (currentCount >= DAILY_MAX_QUOTA) {
+    if (currentCount >= effectiveMaxQuota) {
       return NextResponse.json(
         {
           error:
             "Maaf, batas kuota AI Image gratis Anda hari ini sudah habis. Kuota harian Anda adalah maksimal 3 gambar per hari dan akan direset otomatis pada pukul 00:00 WIB esok hari.",
           exhausted: true,
           usedCount: currentCount,
-          maxQuota: DAILY_MAX_QUOTA,
+          maxQuota: effectiveMaxQuota,
           remaining: 0,
         },
         { status: 429 }
@@ -373,7 +379,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 5. COMPOSE COMPOSITE POSTER WITH MARKETER'S REAL QR CODE & BRANDING
-    const finalPosterUrl = createPhotorealisticBrandedPoster({
+    const posterResult = createPhotorealisticBrandedPoster({
       realPhotoDataUrl,
       qrCodeDataUrl,
       marketerName,
@@ -400,17 +406,18 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const remaining = Math.max(0, DAILY_MAX_QUOTA - updatedQuota.count);
+    const remaining = Math.max(0, effectiveMaxQuota - updatedQuota.count);
 
     return NextResponse.json({
       success: true,
-      imageUrl: finalPosterUrl,
+      imageUrl: posterResult.dataUrl,
+      svgXml: posterResult.svgXml,
       provider: providerUsed,
       quota: {
         usedCount: updatedQuota.count,
-        maxQuota: DAILY_MAX_QUOTA,
+        maxQuota: effectiveMaxQuota,
         remaining,
-        isExhausted: updatedQuota.count >= DAILY_MAX_QUOTA,
+        isExhausted: updatedQuota.count >= effectiveMaxQuota,
       },
       message:
         remaining > 0
