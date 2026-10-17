@@ -281,6 +281,15 @@ export function AiStudioView({
     if (!generatedImageUrl) return;
 
     try {
+      let srcToLoad = generatedImageUrl;
+      let blobUrlToRevoke = "";
+
+      if (generatedSvgXml) {
+        const svgBlob = new Blob([generatedSvgXml], { type: "image/svg+xml;charset=utf-8" });
+        srcToLoad = URL.createObjectURL(svgBlob);
+        blobUrlToRevoke = srcToLoad;
+      }
+
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.onload = () => {
@@ -298,6 +307,7 @@ export function AiStudioView({
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+            if (blobUrlToRevoke) URL.revokeObjectURL(blobUrlToRevoke);
             return;
           }
         } catch {
@@ -310,6 +320,7 @@ export function AiStudioView({
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        if (blobUrlToRevoke) URL.revokeObjectURL(blobUrlToRevoke);
       };
 
       img.onerror = () => {
@@ -319,9 +330,10 @@ export function AiStudioView({
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        if (blobUrlToRevoke) URL.revokeObjectURL(blobUrlToRevoke);
       };
 
-      img.src = generatedImageUrl;
+      img.src = srcToLoad;
     } catch {
       // Fallback direct download
       const a = document.createElement("a");

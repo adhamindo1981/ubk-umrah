@@ -132,12 +132,29 @@ function getRealPhotoDataUrl(prompt: string): string {
 }
 
 /**
+ * Reads the official 3D gold UBK emblem logo as base64 Data URL
+ */
+function getUbkLogoDataUrl(): string {
+  try {
+    const logoPath = path.join(process.cwd(), "public", "images", "ubk-gold-logo.png");
+    if (fs.existsSync(logoPath)) {
+      const buffer = fs.readFileSync(logoPath);
+      return `data:image/png;base64,${buffer.toString("base64")}`;
+    }
+  } catch (err) {
+    console.error("Error reading UBK gold logo:", err);
+  }
+  return "";
+}
+
+/**
  * Creates a high-resolution, photorealistic composite poster (1080x1080)
- * embedding the real photograph and the marketer's live scannable QR Code & Contact card.
+ * embedding the real photograph, marketer's live QR Code, and the official 3D UBK emblem logo.
  */
 function createPhotorealisticBrandedPoster(params: {
   realPhotoDataUrl: string;
   qrCodeDataUrl: string;
+  ubkLogoDataUrl: string;
   marketerName: string;
   marketerPhone: string;
   referralCode: string;
@@ -146,6 +163,7 @@ function createPhotorealisticBrandedPoster(params: {
   const {
     realPhotoDataUrl,
     qrCodeDataUrl,
+    ubkLogoDataUrl,
     marketerName,
     marketerPhone,
     referralCode,
@@ -203,31 +221,45 @@ function createPhotorealisticBrandedPoster(params: {
     <rect x="0" y="520" width="1080" height="560" fill="url(#bottomShadow)" />
 
     <!-- 3. Top Header: Official UBK Accreditation Badge -->
-    <g transform="translate(40, 40)" dir="ltr" style="direction: ltr !important;">
-      <rect x="0" y="0" width="1000" height="76" rx="38" fill="#021A16" fill-opacity="0.88" stroke="#F59E0B" stroke-width="2" filter="url(#softGlow)" />
+    <g transform="translate(40, 36)" dir="ltr" style="direction: ltr !important;">
+      <rect x="0" y="0" width="1000" height="84" rx="42" fill="#021A16" fill-opacity="0.9" stroke="#F59E0B" stroke-width="2.5" filter="url(#softGlow)" />
       
-      <circle cx="44" cy="38" r="24" fill="#065F46" stroke="#FBBF24" stroke-width="1.5" />
-      <text x="44" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="900" fill="#FDE047" text-anchor="middle" direction="ltr">🕋</text>
+      <!-- 3D Gold UBK Emblem Logo -->
+      ${
+        ubkLogoDataUrl
+          ? `<image href="${ubkLogoDataUrl}" xlink:href="${ubkLogoDataUrl}" x="16" y="8" width="68" height="68" preserveAspectRatio="xMidYMid meet" filter="url(#softGlow)" />`
+          : `<circle cx="44" cy="42" r="26" fill="#065F46" stroke="#FBBF24" stroke-width="1.5" /><text x="44" y="50" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="900" fill="#FDE047" text-anchor="middle" direction="ltr">🕋</text>`
+      }
 
-      <text x="84" y="34" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="900" fill="#FFFFFF" letter-spacing="1.2" text-anchor="start" direction="ltr">
+      <text x="96" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="900" fill="#FFFFFF" letter-spacing="1.2" text-anchor="start" direction="ltr">
         PT. UMAR BIN ALKHATTAB FOR UMRAH (UBK)
       </text>
-      <text x="84" y="56" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#6EE7B7" text-anchor="start" direction="ltr">
+      <text x="96" y="62" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#6EE7B7" text-anchor="start" direction="ltr">
         IZIN RESMI KEMENAG RI NO. U-271 TAHUN 2021 • PPIU TERAKREDITASI
       </text>
 
-      <rect x="800" y="16" width="176" height="44" rx="22" fill="url(#goldGradient)" />
-      <text x="888" y="44" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="900" fill="#022C22" text-anchor="middle" letter-spacing="1" direction="ltr">
+      <rect x="790" y="18" width="186" height="48" rx="24" fill="url(#goldGradient)" />
+      <text x="883" y="48" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="900" fill="#022C22" text-anchor="middle" letter-spacing="1" direction="ltr">
         PROGRAM 2026
       </text>
     </g>
+
+    <!-- Luxury Floating UBK 3D Watermark Emblem Badge (Top Right Sub-layer) -->
+    ${
+      ubkLogoDataUrl
+        ? `<g transform="translate(940, 140)" opacity="0.9" filter="url(#cardShadow)" dir="ltr">
+            <circle cx="45" cy="45" r="42" fill="#021A16" fill-opacity="0.75" stroke="#F59E0B" stroke-width="2" />
+            <image href="${ubkLogoDataUrl}" xlink:href="${ubkLogoDataUrl}" x="12" y="10" width="66" height="66" preserveAspectRatio="xMidYMid meet" />
+           </g>`
+        : ""
+    }
 
     <!-- 4. Campaign Highlight & USPs Banner -->
     <g transform="translate(40, 670)" dir="ltr" style="direction: ltr !important;">
       <rect x="0" y="0" width="1000" height="96" rx="24" fill="#021A16" fill-opacity="0.9" stroke="#10B981" stroke-width="2" />
       
       <text x="32" y="40" font-family="'Segoe UI', Roboto, sans-serif" font-size="17" font-weight="900" fill="#FDE047" text-anchor="start" direction="ltr">
-        ✨ ${cleanPrompt || "PAKET RESMI UMRAH 2026 BERKUALITAS & SESUAI SUNNAH"}
+        ✨ ${cleanPrompt || "PAKET RESMI UMRAH 2026 BERKUALITAS &amp; SESUAI SUNNAH"}
       </text>
 
       <text x="32" y="74" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#ECFDF5" text-anchor="start" direction="ltr">
@@ -255,9 +287,9 @@ function createPhotorealisticBrandedPoster(params: {
       <!-- Marketer Credentials & Contacts (Middle Section) -->
       <g transform="translate(254, 28)" dir="ltr" style="direction: ltr !important; text-align: left !important;">
         <!-- Badge -->
-        <rect x="0" y="0" width="280" height="28" rx="14" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="1.5" />
-        <text x="140" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="900" fill="#065F46" text-anchor="middle" direction="ltr">
-          KONSULTAN & MITRA PEMASAR RESMI
+        <rect x="0" y="0" width="300" height="28" rx="14" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="1.5" />
+        <text x="150" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="900" fill="#065F46" text-anchor="middle" direction="ltr">
+          KONSULTAN &amp; MITRA PEMASAR RESMI
         </text>
 
         <!-- Marketer Name -->
@@ -268,7 +300,7 @@ function createPhotorealisticBrandedPoster(params: {
         <!-- WhatsApp & Code -->
         <rect x="0" y="74" width="530" height="34" rx="12" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1" />
         <text x="16" y="96" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="800" fill="#047857" text-anchor="start" direction="ltr">
-          📲 WhatsApp: ${safePhone}   |   Kode Mitra: ${safeCode}
+          WhatsApp: ${safePhone}   |   Kode Mitra: ${safeCode}
         </text>
 
         <!-- Guidance -->
@@ -277,24 +309,27 @@ function createPhotorealisticBrandedPoster(params: {
         </text>
 
         <text x="0" y="156" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#047857" text-anchor="start" direction="ltr">
-          Scan QR Barcode di samping untuk simulasi tabungan & amankan seat Anda!
+          Scan QR Barcode di samping untuk simulasi tabungan &amp; amankan seat Anda!
         </text>
       </g>
 
-      <!-- Security / Verified Stamp (Right Side) -->
-      <g transform="translate(820, 34)" dir="ltr" style="direction: ltr !important;">
-        <rect x="0" y="0" width="156" height="186" rx="20" fill="#F0FDF4" stroke="#86EFAC" stroke-width="2" />
+      <!-- Security / Verified Stamp (Right Side with UBK 3D Logo) -->
+      <g transform="translate(820, 26)" dir="ltr" style="direction: ltr !important;">
+        <rect x="0" y="0" width="156" height="202" rx="22" fill="#F0FDF4" stroke="#86EFAC" stroke-width="2" />
         
-        <circle cx="78" cy="48" r="28" fill="#059669" />
-        <text x="78" y="58" font-family="'Segoe UI', Roboto, sans-serif" font-size="26" font-weight="900" fill="#FFFFFF" text-anchor="middle" direction="ltr">✓</text>
+        ${
+          ubkLogoDataUrl
+            ? `<image href="${ubkLogoDataUrl}" xlink:href="${ubkLogoDataUrl}" x="38" y="12" width="80" height="80" preserveAspectRatio="xMidYMid meet" filter="url(#softGlow)" />`
+            : `<circle cx="78" cy="48" r="28" fill="#059669" /><text x="78" y="58" font-family="'Segoe UI', Roboto, sans-serif" font-size="26" font-weight="900" fill="#FFFFFF" text-anchor="middle" direction="ltr">✓</text>`
+        }
 
-        <text x="78" y="104" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="900" fill="#065F46" text-anchor="middle" direction="ltr">
+        <text x="78" y="112" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="900" fill="#065F46" text-anchor="middle" direction="ltr">
           TERVERIFIKASI
         </text>
-        <text x="78" y="124" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="800" fill="#047857" text-anchor="middle" direction="ltr">
+        <text x="78" y="132" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="800" fill="#047857" text-anchor="middle" direction="ltr">
           MITRA RESMI
         </text>
-        <text x="78" y="152" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="700" fill="#059669" text-anchor="middle" direction="ltr">
+        <text x="78" y="160" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="700" fill="#059669" text-anchor="middle" direction="ltr">
           UBK UMRAH 2026
         </text>
       </g>
@@ -440,9 +475,11 @@ export async function POST(req: NextRequest) {
     }
 
     // 5. COMPOSE COMPOSITE POSTER WITH MARKETER'S REAL QR CODE & BRANDING
+    const ubkLogoDataUrl = getUbkLogoDataUrl();
     const posterResult = createPhotorealisticBrandedPoster({
       realPhotoDataUrl,
       qrCodeDataUrl,
+      ubkLogoDataUrl,
       marketerName,
       marketerPhone,
       referralCode,
