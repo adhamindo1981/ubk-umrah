@@ -54,14 +54,24 @@ function getRealPhotoDataUrl(prompt: string): string {
     ) {
       chosenFile = path.join("landmarks", "albaik-pilgrims.jpg");
     }
-    // 3. Indonesian Family & Kaaba Pilgrims (عائلة، أسرة، أطفال، الكعبة)
+    // 3. Indonesian Pilgrims & Kaaba (معتمرين، سيلفي، مطاف، طواف، عائلة، أسرة، أطفال، الكعبة)
     else if (
       promptLower.includes("keluarga") ||
       promptLower.includes("family") ||
       promptLower.includes("anak") ||
+      promptLower.includes("jamaah") ||
+      promptLower.includes("selfie") ||
+      promptLower.includes("rombongan") ||
       promptLower.includes("عائلة") ||
       promptLower.includes("أسرة") ||
       promptLower.includes("أطفال") ||
+      promptLower.includes("معتمر") ||
+      promptLower.includes("معتمرين") ||
+      promptLower.includes("سلفي") ||
+      promptLower.includes("سيلفي") ||
+      promptLower.includes("مطاف") ||
+      promptLower.includes("طواف") ||
+      promptLower.includes("جماعية") ||
       promptLower.includes("كعبة") ||
       promptLower.includes("kaaba") ||
       promptLower.includes("ka'bah")
@@ -129,6 +139,80 @@ function getRealPhotoDataUrl(prompt: string): string {
   }
 
   return "";
+}
+
+/**
+ * Translates and dynamically enriches any Umrah prompt into a vivid,
+ * highly-detailed photographic description tailored for FLUX.1 AI generation.
+ */
+function translateAndEnrichPrompt(prompt: string): string {
+  const pLower = prompt.toLowerCase();
+
+  // 1. Group selfie in Mataf / Kaaba
+  if (
+    (pLower.includes("سلفي") || pLower.includes("سيلفي") || pLower.includes("selfie")) &&
+    (pLower.includes("مطاف") || pLower.includes("حرم") || pLower.includes("كعبة") || pLower.includes("kaaba") || pLower.includes("makkah"))
+  ) {
+    return "A cheerful joyful group of Indonesian Muslim Umrah pilgrims taking a bright group selfie in the marble courtyard of Mataf with the Holy Kaaba in Makkah in the background, smiling happily in white Ihram and hijabs after completing Umrah, golden daylight, authentic ultra-realistic 8k Canon photograph";
+  }
+
+  // 2. Family in front of Kaaba
+  if (
+    pLower.includes("عائلة") ||
+    pLower.includes("أسرة") ||
+    pLower.includes("keluarga") ||
+    pLower.includes("family")
+  ) {
+    return "A smiling Indonesian Muslim family (father in white Ihram, mother in modest hijab, and happy children) in the open marble courtyard of the Holy Kaaba in Makkah, warm golden sunrise sunlight over the Kaaba, emotional spiritual atmosphere, authentic photorealistic 8k photo";
+  }
+
+  // 3. Qatar Airways Flight & Airplane
+  if (
+    pLower.includes("طائرة") ||
+    pLower.includes("طيران") ||
+    pLower.includes("القطرية") ||
+    pLower.includes("pesawat") ||
+    pLower.includes("qatar") ||
+    pLower.includes("flight") ||
+    pLower.includes("plane")
+  ) {
+    return "A luxurious Qatar Airways passenger airplane flying smoothly above golden clouds with elegant travel suitcases and official Umrah flight tickets, commercial airline poster, golden hour lighting, cinematic, 8k realistic";
+  }
+
+  // 4. Albaik Dining in Makkah
+  if (
+    pLower.includes("البيك") ||
+    pLower.includes("albaik") ||
+    pLower.includes("وجبة") ||
+    pLower.includes("makan") ||
+    pLower.includes("طعام")
+  ) {
+    return "A cheerful group of Umrah pilgrims sitting happily in an elegant hotel dining room in Makkah enjoying famous Albaik fried chicken boxes and meals, warm lighting, happy authentic atmosphere, 8k realistic photograph";
+  }
+
+  // 5. Senior Elderly in Madinah / Nabawi
+  if (
+    pLower.includes("مسجد نبوي") ||
+    pLower.includes("النبوي") ||
+    pLower.includes("المدينة") ||
+    pLower.includes("nabawi") ||
+    pLower.includes("madinah")
+  ) {
+    return "Umrah pilgrims walking relaxed and happy outside a luxury hotel close to the gates of the Prophet Mosque in Madinah, tranquil spiritual atmosphere, green dome in view, 8k realistic photograph";
+  }
+
+  // 6. Haramain High-Speed Train
+  if (
+    pLower.includes("قطار") ||
+    pLower.includes("train") ||
+    pLower.includes("kereta") ||
+    pLower.includes("حرمين")
+  ) {
+    return "Haramain high-speed passenger train traveling smoothly through scenic desert mountains between Makkah and Madinah, modern fast train for Umrah pilgrims, golden sunlight, 8k realistic";
+  }
+
+  // 7. General Dynamic Umrah Enrichment
+  return `Authentic ultra-realistic 8k photograph, ${prompt}, real Indonesian Umrah pilgrims in Holy Makkah or Madinah, peaceful dignified spiritual atmosphere, natural lighting, high resolution`;
 }
 
 /**
@@ -439,10 +523,10 @@ export async function POST(req: NextRequest) {
       process.env.HUGGING_FACE_HUB_TOKEN ||
       "";
 
-    // Attempt Hugging Face if token provided
+    // 4.1. Attempt Hugging Face if token provided
     if (hfToken) {
       try {
-        const enrichedPrompt = `Authentic ultra-realistic 8K photograph, ${prompt}, real people pilgrims in Makkah/Madinah, emotional, dignified, golden hour, genuine Canon EOS R5 photo, high resolution`;
+        const enrichedPrompt = translateAndEnrichPrompt(prompt);
         const hfRes = await fetch(
           "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
           {
@@ -464,11 +548,35 @@ export async function POST(req: NextRequest) {
           providerUsed = "Hugging Face (FLUX.1-schnell)";
         }
       } catch (err) {
-        console.error("HF Inference error, falling back to local photo assets:", err);
+        console.error("HF Inference error:", err);
       }
     }
 
-    // High quality real photography asset fallback
+    // 4.2. Instant On-The-Fly FLUX AI Generation (Free, No API Key Required)
+    if (!realPhotoDataUrl) {
+      try {
+        const fluxPrompt = translateAndEnrichPrompt(prompt);
+        const fluxUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(fluxPrompt)}?width=1080&height=1080&nologo=true&model=flux`;
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 12000); // 12-second timeout
+
+        const fluxRes = await fetch(fluxUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (fluxRes.ok) {
+          const buffer = await fluxRes.arrayBuffer();
+          if (buffer.byteLength > 1000) {
+            realPhotoDataUrl = `data:image/jpeg;base64,${Buffer.from(buffer).toString("base64")}`;
+            providerUsed = "FLUX.1 AI Generator";
+          }
+        }
+      } catch (err) {
+        console.error("FLUX Live AI generation error, using curated photography assets:", err);
+      }
+    }
+
+    // 4.3. High quality real photography asset fallback
     if (!realPhotoDataUrl) {
       realPhotoDataUrl = getRealPhotoDataUrl(prompt);
       providerUsed = "UBK Verified HD Photography + Real QR Barcode";
