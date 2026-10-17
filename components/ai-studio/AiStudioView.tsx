@@ -927,6 +927,8 @@ export function AiStudioView({
                   >
                     {generatedSvgXml ? (
                       <div
+                        dir="ltr"
+                        style={{ direction: "ltr", textAlign: "left" }}
                         className="w-full h-auto aspect-square rounded-2xl overflow-hidden [&>svg]:w-full [&>svg]:h-auto [&>svg]:block"
                         dangerouslySetInnerHTML={{ __html: generatedSvgXml }}
                       />

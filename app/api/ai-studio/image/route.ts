@@ -23,7 +23,53 @@ function getRealPhotoDataUrl(prompt: string): string {
 
     let chosenFile = "hero-composite-panorama.jpg";
 
+    // 1. Flight & Airlines (طيران، طائرة، الخطوط القطرية، مطار)
     if (
+      promptLower.includes("pesawat") ||
+      promptLower.includes("plane") ||
+      promptLower.includes("airplane") ||
+      promptLower.includes("flight") ||
+      promptLower.includes("qatar") ||
+      promptLower.includes("airways") ||
+      promptLower.includes("طائرة") ||
+      promptLower.includes("طيران") ||
+      promptLower.includes("القطرية") ||
+      promptLower.includes("مطار") ||
+      promptLower.includes("airport") ||
+      promptLower.includes("تذاكر سفر") ||
+      promptLower.includes("حقائب سفر")
+    ) {
+      chosenFile = path.join("landmarks", "qatar-airways-plane.jpg");
+    }
+    // 2. Albaik & Meals / Dining (البيك، وجبة، طعام، مطعم)
+    else if (
+      promptLower.includes("albaik") ||
+      promptLower.includes("al-baik") ||
+      promptLower.includes("makan") ||
+      promptLower.includes("kuliner") ||
+      promptLower.includes("البيك") ||
+      promptLower.includes("وجبة") ||
+      promptLower.includes("طعام") ||
+      promptLower.includes("مطعم")
+    ) {
+      chosenFile = path.join("landmarks", "albaik-pilgrims.jpg");
+    }
+    // 3. Indonesian Family & Kaaba Pilgrims (عائلة، أسرة، أطفال، الكعبة)
+    else if (
+      promptLower.includes("keluarga") ||
+      promptLower.includes("family") ||
+      promptLower.includes("anak") ||
+      promptLower.includes("عائلة") ||
+      promptLower.includes("أسرة") ||
+      promptLower.includes("أطفال") ||
+      promptLower.includes("كعبة") ||
+      promptLower.includes("kaaba") ||
+      promptLower.includes("ka'bah")
+    ) {
+      chosenFile = path.join("landmarks", "indonesian-family-kaaba.jpg");
+    }
+    // 4. Madinah & Nabawi Mosque (المدينة المنورة، المسجد النبوي)
+    else if (
       promptLower.includes("madinah") ||
       promptLower.includes("nabawi") ||
       promptLower.includes("المدينة") ||
@@ -31,27 +77,33 @@ function getRealPhotoDataUrl(prompt: string): string {
       promptLower.includes("روضة")
     ) {
       chosenFile = path.join("landmarks", "madinah-nabawi.jpg");
-    } else if (
+    }
+    // 5. Haramain High-Speed Train (قطار الحرمين السريع)
+    else if (
       promptLower.includes("kereta") ||
       promptLower.includes("train") ||
       promptLower.includes("قطار") ||
-      promptLower.includes("سفر")
+      promptLower.includes("سريع") ||
+      promptLower.includes("حرمين")
     ) {
       chosenFile = path.join("landmarks", "haramain-train.jpg");
-    } else if (
+    }
+    // 6. Taif Cable Car (الطائف، تلفريك)
+    else if (
       promptLower.includes("taif") ||
       promptLower.includes("cable") ||
       promptLower.includes("الطائف") ||
       promptLower.includes("تلفريك")
     ) {
       chosenFile = path.join("landmarks", "taif-cablecar.jpg");
-    } else if (
+    }
+    // 7. Makkah & Clock Tower (مكة المكرمة، برج الساعة)
+    else if (
       promptLower.includes("makkah") ||
-      promptLower.includes("kaaba") ||
-      promptLower.includes("ka'bah") ||
       promptLower.includes("مكة") ||
-      promptLower.includes("الكعبة") ||
-      promptLower.includes("حرم")
+      promptLower.includes("حرم") ||
+      promptLower.includes("ساعة") ||
+      promptLower.includes("clock")
     ) {
       chosenFile = path.join("landmarks", "makkah-clock.jpg");
     }
@@ -105,17 +157,17 @@ function createPhotorealisticBrandedPoster(params: {
   const safePhone = escapeXml(marketerPhone);
   const safeCode = escapeXml(referralCode || "UBK-OFFICIAL");
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1080 1080" width="1080" height="1080">
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1080 1080" width="1080" height="1080" dir="ltr" style="direction: ltr !important; text-align: left !important; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
     <defs>
       <linearGradient id="topShadow" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#021B1A" stop-opacity="0.92" />
-        <stop offset="40%" stop-color="#021B1A" stop-opacity="0.5" />
+        <stop offset="0%" stop-color="#021B1A" stop-opacity="0.95" />
+        <stop offset="45%" stop-color="#021B1A" stop-opacity="0.6" />
         <stop offset="100%" stop-color="#021B1A" stop-opacity="0" />
       </linearGradient>
 
       <linearGradient id="bottomShadow" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stop-color="#000000" stop-opacity="0" />
-        <stop offset="35%" stop-color="#021815" stop-opacity="0.75" />
+        <stop offset="30%" stop-color="#021815" stop-opacity="0.8" />
         <stop offset="100%" stop-color="#010D0C" stop-opacity="0.98" />
       </linearGradient>
 
@@ -133,8 +185,8 @@ function createPhotorealisticBrandedPoster(params: {
         </feMerge>
       </filter>
 
-      <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="130%">
-        <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.6" />
+      <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="120%">
+        <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000000" flood-opacity="0.5" />
       </filter>
     </defs>
 
@@ -147,94 +199,103 @@ function createPhotorealisticBrandedPoster(params: {
     }
 
     <!-- 2. Lighting & Contrast Overlays for Text Legibility -->
-    <rect x="0" y="0" width="1080" height="260" fill="url(#topShadow)" />
+    <rect x="0" y="0" width="1080" height="250" fill="url(#topShadow)" />
     <rect x="0" y="520" width="1080" height="560" fill="url(#bottomShadow)" />
 
     <!-- 3. Top Header: Official UBK Accreditation Badge -->
-    <g transform="translate(40, 40)">
-      <!-- Glass Pill Badge -->
-      <rect x="0" y="0" width="1000" height="74" rx="37" fill="#021A16" fill-opacity="0.82" stroke="#F59E0B" stroke-width="2" filter="url(#softGlow)" />
+    <g transform="translate(40, 40)" dir="ltr" style="direction: ltr !important;">
+      <rect x="0" y="0" width="1000" height="76" rx="38" fill="#021A16" fill-opacity="0.88" stroke="#F59E0B" stroke-width="2" filter="url(#softGlow)" />
       
-      <circle cx="42" cy="37" r="22" fill="#065F46" stroke="#FBBF24" stroke-width="1.5" />
-      <text x="42" y="44" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="900" fill="#FDE047" text-anchor="middle">🕋</text>
+      <circle cx="44" cy="38" r="24" fill="#065F46" stroke="#FBBF24" stroke-width="1.5" />
+      <text x="44" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="900" fill="#FDE047" text-anchor="middle" direction="ltr">🕋</text>
 
-      <text x="80" y="34" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="900" fill="#FFFFFF" letter-spacing="1.5">
+      <text x="84" y="34" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="900" fill="#FFFFFF" letter-spacing="1.2" text-anchor="start" direction="ltr">
         PT. UMAR BIN ALKHATTAB FOR UMRAH (UBK)
       </text>
-      <text x="80" y="56" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#6EE7B7">
+      <text x="84" y="56" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#6EE7B7" text-anchor="start" direction="ltr">
         IZIN RESMI KEMENAG RI NO. U-271 TAHUN 2021 • PPIU TERAKREDITASI
       </text>
 
-      <rect x="800" y="16" width="176" height="42" rx="21" fill="url(#goldGradient)" />
-      <text x="888" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="900" fill="#022C22" text-anchor="middle" letter-spacing="1">
+      <rect x="800" y="16" width="176" height="44" rx="22" fill="url(#goldGradient)" />
+      <text x="888" y="44" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="900" fill="#022C22" text-anchor="middle" letter-spacing="1" direction="ltr">
         PROGRAM 2026
       </text>
     </g>
 
     <!-- 4. Campaign Highlight & USPs Banner -->
-    <g transform="translate(40, 680)">
-      <rect x="0" y="0" width="1000" height="88" rx="22" fill="#021A16" fill-opacity="0.88" stroke="#10B981" stroke-width="1.5" />
+    <g transform="translate(40, 670)" dir="ltr" style="direction: ltr !important;">
+      <rect x="0" y="0" width="1000" height="96" rx="24" fill="#021A16" fill-opacity="0.9" stroke="#10B981" stroke-width="2" />
       
-      <text x="30" y="36" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="900" fill="#FDE047">
+      <text x="32" y="40" font-family="'Segoe UI', Roboto, sans-serif" font-size="17" font-weight="900" fill="#FDE047" text-anchor="start" direction="ltr">
         ✨ ${cleanPrompt || "PAKET RESMI UMRAH 2026 BERKUALITAS & SESUAI SUNNAH"}
       </text>
 
-      <text x="30" y="66" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#ECFDF5">
-        ✈️ Qatar Airways 5★ • 🏨 Hotel Dekat Tanpa Shuttle Bus • 💰 Cukup DP 5 Juta • 🍗 Free Albaik
+      <text x="32" y="74" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#ECFDF5" text-anchor="start" direction="ltr">
+        ✈️ Qatar Airways 5★  •  🏨 Hotel Dekat Tanpa Shuttle Bus  •  💰 Cukup DP 5 Juta  •  🍗 Free Albaik
       </text>
     </g>
 
     <!-- 5. Marketer Footer Card with Real Scannable Barcode (QR Code) -->
-    <g transform="translate(40, 788)" filter="url(#cardShadow)">
+    <g transform="translate(40, 786)" filter="url(#cardShadow)" dir="ltr" style="direction: ltr !important;">
       <!-- Main White Card Container -->
-      <rect x="0" y="0" width="1000" height="248" rx="30" fill="#FFFFFF" stroke="#F59E0B" stroke-width="3.5" />
+      <rect x="0" y="0" width="1000" height="254" rx="28" fill="#FFFFFF" stroke="#F59E0B" stroke-width="3" />
 
-      <!-- QR Code Placement (Real Scannable Barcode) -->
-      <rect x="24" y="24" width="200" height="200" rx="20" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="2" />
+      <!-- QR Code Container (Left Side) -->
+      <rect x="24" y="24" width="206" height="206" rx="20" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="2" />
       ${
         qrCodeDataUrl
-          ? `<image href="${qrCodeDataUrl}" xlink:href="${qrCodeDataUrl}" x="34" y="34" width="180" height="180" />`
-          : `<rect x="34" y="34" width="180" height="180" fill="#047857" rx="12" />`
+          ? `<image href="${qrCodeDataUrl}" xlink:href="${qrCodeDataUrl}" x="37" y="32" width="180" height="180" />`
+          : `<rect x="37" y="32" width="180" height="180" fill="#047857" rx="12" />`
       }
+      <rect x="34" y="196" width="186" height="24" rx="8" fill="#065F46" />
+      <text x="127" y="213" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="900" fill="#FDE047" text-anchor="middle" direction="ltr">
+        SCAN ME • DAFTAR SEKARANG
+      </text>
 
-      <!-- Marketer Credentials & Contacts -->
-      <g transform="translate(250, 48)">
-        <text x="0" y="0" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="900" fill="#047857" letter-spacing="1.5">
-          KONSULTAN & MITRA PEMASAR RESMI:
+      <!-- Marketer Credentials & Contacts (Middle Section) -->
+      <g transform="translate(254, 28)" dir="ltr" style="direction: ltr !important; text-align: left !important;">
+        <!-- Badge -->
+        <rect x="0" y="0" width="280" height="28" rx="14" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="1.5" />
+        <text x="140" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="900" fill="#065F46" text-anchor="middle" direction="ltr">
+          KONSULTAN & MITRA PEMASAR RESMI
         </text>
 
-        <text x="0" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="30" font-weight="900" fill="#0F172A">
+        <!-- Marketer Name -->
+        <text x="0" y="58" font-family="'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="900" fill="#0F172A" text-anchor="start" direction="ltr">
           ${safeName}
         </text>
 
-        <text x="0" y="74" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#065F46">
-          📲 WhatsApp: ${safePhone}  |  Kode Mitra: ${safeCode}
+        <!-- WhatsApp & Code -->
+        <rect x="0" y="74" width="530" height="34" rx="12" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1" />
+        <text x="16" y="96" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="800" fill="#047857" text-anchor="start" direction="ltr">
+          📲 WhatsApp: ${safePhone}   |   Kode Mitra: ${safeCode}
         </text>
 
-        <text x="0" y="102" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#64748B">
-          Daftarkan ibadah Umrah Anda melalui tautan resmi terverifikasi di atas.
+        <!-- Guidance -->
+        <text x="0" y="132" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#64748B" text-anchor="start" direction="ltr">
+          Daftarkan ibadah Umrah Anda melalui konsultasi resmi terverifikasi Kemenag RI.
         </text>
 
-        <text x="0" y="128" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#047857">
-          Scan QR Code di samping untuk simulasi tabungan & amankan seat Anda!
+        <text x="0" y="156" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#047857" text-anchor="start" direction="ltr">
+          Scan QR Barcode di samping untuk simulasi tabungan & amankan seat Anda!
         </text>
       </g>
 
-      <!-- Security / Verified Stamp -->
-      <g transform="translate(820, 36)">
-        <rect x="0" y="0" width="156" height="176" rx="20" fill="#F0FDF4" stroke="#86EFAC" stroke-width="2" />
+      <!-- Security / Verified Stamp (Right Side) -->
+      <g transform="translate(820, 34)" dir="ltr" style="direction: ltr !important;">
+        <rect x="0" y="0" width="156" height="186" rx="20" fill="#F0FDF4" stroke="#86EFAC" stroke-width="2" />
         
-        <circle cx="78" cy="46" r="26" fill="#059669" />
-        <text x="78" y="55" font-family="'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="900" fill="#FFFFFF" text-anchor="middle">✓</text>
+        <circle cx="78" cy="48" r="28" fill="#059669" />
+        <text x="78" y="58" font-family="'Segoe UI', Roboto, sans-serif" font-size="26" font-weight="900" fill="#FFFFFF" text-anchor="middle" direction="ltr">✓</text>
 
-        <text x="78" y="98" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="900" fill="#065F46" text-anchor="middle">
-          VERIFIKASI
+        <text x="78" y="104" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="900" fill="#065F46" text-anchor="middle" direction="ltr">
+          TERVERIFIKASI
         </text>
-        <text x="78" y="116" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="800" fill="#047857" text-anchor="middle">
+        <text x="78" y="124" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="800" fill="#047857" text-anchor="middle" direction="ltr">
           MITRA RESMI
         </text>
-        <text x="78" y="146" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="700" fill="#059669" text-anchor="middle">
-          UBK UMRAH
+        <text x="78" y="152" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="700" fill="#059669" text-anchor="middle" direction="ltr">
+          UBK UMRAH 2026
         </text>
       </g>
     </g>
